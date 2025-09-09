@@ -1,0 +1,90 @@
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #1f2937; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "KMITLGO" !important;
+}
+
+.app-frame {
+  width: 1080px;
+  height: 1920px;
+  overflow: hidden;
+  position: relative;
+  background-color: black;
+  border-radius: 16px; 
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+}
+
+@font-face {
+  font-family: "KMITLGO";
+  src: url("/fonts/KMITLGO-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "KMITLGO";
+  src: url("/fonts/KMITLGO-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "KMITLGO";
+  src: url("/fonts/KMITLGO-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "KMITLGO";
+  src: url("/fonts/KMITLGO-Bold-Italic.woff2") format("woff2");
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "KMITLGO";
+  src: url("/fonts/KMITLGO-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "KMITLGO";
+  src: url("/fonts/KMITLGO-Light-Italic.woff2") format("woff2");
+  font-weight: 300;
+  font-style: italic;
+}
+
+.ant-typography,
+.ant-select,
+.ant-form-item-explain-error,
+.ant-input,
+.ant-input-number-input,
+.ant-select-item,
+.ant-radio-label,
+.ant-btn,
+.ant-form-item .ant-form-item-label,
+.ant-segmented-item,
+.ant-tabs,
+.ant-picker-input input,
+.ant-picker-dropdown,
+.ant-picker-cell-inner,
+.ant-empty-description,
+.ant.checkbox-label,
+.ant-slider-mark-text {
+   font-family: "KMITLGO" !important;
+}
+
+.ant-btn-primary {
+  background-color: #F97316 !important; 
+  border-color: #F97316 !important;
+}

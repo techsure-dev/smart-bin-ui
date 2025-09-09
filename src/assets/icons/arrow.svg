@@ -1,0 +1,22 @@
+<svg width="38" height="67" viewBox="0 0 38 67" xmlns="http://www.w3.org/2000/svg" className="h-16 w-8 animate-bounce">
+  <defs>
+    <mask id="fadeMask" maskUnits="userSpaceOnUse" x="0" y="0" width="38" height="67">
+      <linearGradient id="maskGradient" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="white" stopOpacity="0.2"/>
+        <stop offset="100%" stopColor="white" stopOpacity="1"/>
+      </linearGradient>
+      <rect x="0" y="0" width="38" height="67" fill="url(#maskGradient)" />
+    </mask>
+  </defs>
+
+  <path
+    d="M0.1875 12.0421L0.1875 0.948242L18.7054 16.0278L37.2242 0.948242L37.2242 12.0421L18.7054 27.1207L0.1875 12.0421Z"
+    fill={iconColor}
+    mask="url(#fadeMask)"
+  />
+ 
+  <path
+    d="M0.1875 29.0706L0.1875 17.9768L18.7054 33.0563L37.2242 17.9768L37.2242 29.0706L18.7054 44.1493L0.1875 29.0706Z"
+    fill={iconColor} 
+  />
+</svg>
