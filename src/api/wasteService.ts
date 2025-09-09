@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://octocat.thddns.net:8332"; 
+const BASE_URL = "/api"; 
 const API_KEY = "power2edit"; 
 
 export interface WasteClassificationResult {
@@ -9,15 +9,13 @@ export interface WasteClassificationResult {
   [key: string]: any;
 }
 
-export const classifyWaste = async (
-  file: File
-): Promise<WasteClassificationResult> => {
+export const classifyWaste = async (file: File): Promise<WasteClassificationResult> => {
   const formData = new FormData();
   formData.append("file", file);
 
   try {
     const response = await axios.post<WasteClassificationResult>(
-      `${BASE_URL}/classify/image/classify`,
+      `${BASE_URL}/classify`,
       formData,
       {
         headers: {
@@ -32,3 +30,4 @@ export const classifyWaste = async (
     throw error;
   }
 };
+

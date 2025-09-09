@@ -4,6 +4,8 @@ import PredictionPage from "../pages/prediction";
 import SelectWastePage from "../pages/select-waste";
 import OptionPage from "../pages/option";
 import ScorePage from "../pages/score";
+import LoadingPage from "../pages/loading";
+import CorrectPage from "../pages/correct";
 
 const routes = [
   {
@@ -29,6 +31,14 @@ const routes = [
   {
     path: "/score",
     element: <ScorePage />,
+  },
+  {
+    path: "/loading",
+    element: <LoadingPage />,
+  },
+  {
+    path: "/correct",
+    element: <CorrectPage/>,
   },
 ];
 

@@ -88,3 +88,13 @@ html, body, #root {
   background-color: #F97316 !important; 
   border-color: #F97316 !important;
 }
+
+.ant-btn-default{
+  border-color: #F97316 !important;
+  color: #F97316 !important;
+}
+
+.ant-btn-dashed{
+  border-color: #F97316 !important;
+  color: #F97316 !important;
+}

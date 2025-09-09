@@ -2,17 +2,13 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import SmartBinVideo from "../../assets/video/Smart_Bin_Video.mp4";
 import CategoryCard from "./component/CategoryCard";
-import rdf from "../../assets/images/rdf.png";
-import general from "../../assets/images/general_waste.png";
-import plastic from "../../assets/images/plastic_bottle.png";
-import glass from "../../assets/images/glass_can.png";
-import food from "../../assets/images/food_waste.png";
 import { Button, Flex, Typography } from "antd";
 import Header from "../../component/Header";
+import { wasteMap} from "../../types/wasteType"; 
 
 const { Text } = Typography;
 
-const MainPage: React.FC = () => {
+const MainPage = () => {
   const navigate = useNavigate();
   const [showOverlay, setShowOverlay] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -65,53 +61,24 @@ const MainPage: React.FC = () => {
             </Flex>
 
             <Flex className="grid grid-cols-5 divide-x-2 divide-gray-300 mt-36">
-              <CategoryCard
-                image={rdf}
-                header="ขยะกำพร้า"
-                title="(Refused Derived Fuel,RDF)"
-                bgColor="#838383"
-                iconColor="#A2ABB5"
-                textColor="#FFFFFF"
-              />
-              <CategoryCard
-                image={general}
-                header="ขยะทั่วไป"
-                title="(General Waste)"
-                bgColor="#235B90"
-                iconColor="#235B90"
-                textColor="#FFFFFF"
-              />
-              <CategoryCard
-                image={plastic}
-                header="ขวดพลาสติก"
-                title="(Plastic Bottle)"
-                bgColor="#F6B31E"
-                iconColor="#F5BE0C"
-                textColor="#000000"
-              />
-              <CategoryCard
-                image={glass}
-                header="ขวดแก้ว/กระป๋อง/โลหะ/อะลูมิเนียม"
-                title="(Glass/Can/Metal/Aluminium)"
-                bgColor="#F6B31E"
-                iconColor="#F5BE0C"
-                textColor="#000000"
-              />
-              <CategoryCard
-                image={food}
-                header="เศษอาหาร"
-                title="(Food Waste)"
-                bgColor="#00712C"
-                iconColor="#00712C"
-                textColor="#FFFFFF"
-              />
+              {Object.entries(wasteMap).map(([key, waste]) => (
+                <CategoryCard
+                  key={key}
+                  image={waste.image}
+                  header={key} 
+                  title={`(${waste.description})`} 
+                  bgColor={waste.bgColor}
+                  iconColor={waste.iconColor || waste.bgColor}
+                  textColor={waste.textColor}
+                />
+              ))}
             </Flex>
           </Flex>
 
           <Button
             onClick={() => navigate("/scan")}
             type="primary"
-            className="h-[120px] rounded-full animate-scalePulse bg-background-brand text-white text-heading-xl font-bold flex px-8 mb-52"
+            className="h-[120px] rounded-full animate-scalePulse bg-background-brand text-white text-heading-l font-bold flex px-8 mb-52"
           >
             แตะหน้าจอเพื่อเริ่มแยกขยะ
           </Button>

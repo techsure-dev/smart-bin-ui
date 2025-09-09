@@ -29,8 +29,8 @@ const CategoryCard = ({
        <div
         className="flex items-center justify-center mb-2"
         style={{
-          width: "144px", // fixed width
-          height: "144px", // fixed height
+          width: "144px", 
+          height: "144px", 
           overflow: "hidden",
         }}
       >
@@ -57,7 +57,7 @@ const CategoryCard = ({
           textAlign: "center",
         }}
       >
-        <Text className="text-heading-l font-bold" style={{ color: textColor }}>
+        <Text className="text-heading-s font-bold" style={{ color: textColor }}>
           {header}
         </Text>
         <Text className="text-label-m" style={{ color: textColor }}>
