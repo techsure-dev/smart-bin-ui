@@ -1,7 +1,7 @@
 import { Button, Flex, Typography } from "antd";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCamera } from "../../hook/useCamera"; 
-import { useNavigate } from "react-router-dom"; // ✅ import navigate
+import { useLocation, useNavigate } from "react-router-dom"; 
 import bg from "../../assets/images/bg.png";
 import dot from "../../assets/images/Dot.png";
 import arrow_left from "../../assets/images/arrow_left.png";
@@ -12,7 +12,9 @@ const { Text } = Typography;
 const ScanPage = () => {
   const { videoRef, devices, startCamera } = useCamera();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+  const location = useLocation(); 
+    const [errorMessage, setErrorMessage] = useState<string>()
 
   useEffect(() => {
     if (devices.length > 0) {
@@ -20,6 +22,14 @@ const ScanPage = () => {
       startCamera(usbCamera.deviceId);
     }
   }, [devices]);
+  
+   useEffect(() => {
+  const state = location.state as { toastMessage?: string };
+  if (state?.toastMessage) {
+    setErrorMessage(state.toastMessage); 
+    window.history.replaceState({}, document.title); 
+  }
+}, [location.state]);
 
   const captureAndClassify = () => {
     if (!videoRef.current || !canvasRef.current) return;
@@ -45,7 +55,7 @@ const ScanPage = () => {
 
   return (
     <Flex
-      className="w-full h-screen flex items-center justify-center relative"
+      className="w-full h-screen flex items-center justify-center relative bg-white"
       style={{ backgroundImage: `url(${bg})`, backgroundSize: "cover", backgroundPosition: "center" }}
     >
       <Flex vertical className="absolute top-48 items-center z-20">
@@ -63,6 +73,18 @@ const ScanPage = () => {
       </div>
 
       <canvas ref={canvasRef} className="hidden" />
+
+      {errorMessage && (
+        <div
+          className="absolute w-full flex items-center justify-center z-40 pointer-events-none px-20"
+          style={{ bottom: "400px" }}
+        >
+          <Text className="text-white text-heading-l font-bold bg-black/40 px-4 py-2 rounded text-center">
+            {errorMessage}
+          </Text>
+        </div>
+      )}
+
 
       <Button 
         onClick={captureAndClassify} 

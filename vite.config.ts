@@ -7,7 +7,7 @@ export default defineConfig({
    server: {
     proxy: {
       '/api': {
-        target: 'http://octocat.thddns.net:8332', 
+        target: 'https://api-smart-bin.techsure.xyz', 
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }

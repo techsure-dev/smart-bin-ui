@@ -2,10 +2,10 @@ import { Flex, Typography } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../../component/Header";
 import WasteCard from "./component/WasteCard";
-import { wasteMap } from "../../types/wasteType";
+import { wasteMap } from "../../types/wasteType"; 
 import ArrowIcon from "../../assets/icons/arrow.svg?react";
 import WasteBinCard from "./component/WasteBinCard";
-import AIProfileAnimation from "./component/AIProfileAnimation"; 
+import AIProfileAnimation from "./component/AIProfileAnimation";
 import { useEffect, useState } from "react";
 import CheckCard from "./component/CheckCard";
 import { motion } from "framer-motion";
@@ -19,11 +19,12 @@ const PredictionPage = () => {
   const [showCheckCard, setShowCheckCard] = useState(false);
 
   useEffect(() => {
-  const timer = setTimeout(() => {
-    setShowCheckCard(true);
-  }, 1500); 
-  return () => clearTimeout(timer); 
-}, []);
+    const timer = setTimeout(() => {
+      setShowCheckCard(true);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
 
   if (!state?.result) {
     return (
@@ -91,14 +92,16 @@ const PredictionPage = () => {
               <AIProfileAnimation />
               {showCheckCard && (
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}    
-                  animate={{ opacity: 1, y: 0 }}     
-                  transition={{ duration: 0.8, ease: "easeOut" }} 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
                   className="absolute top-[36%] left-[5%] -translate-y-1/2 z-40"
                 >
                   <CheckCard
                     onCorrect={() => navigate("/correct")}
-                    onWrong={() => navigate("/option", { state: { result } })}
+                    onWrong={() =>
+                      navigate("/option", { state: { result } })
+                    }
                   />
                 </motion.div>
               )}
