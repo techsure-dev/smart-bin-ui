@@ -1,0 +1,12 @@
+services:
+  usb-app:
+    build: .
+    container_name: usb-app
+    ports:
+      - "5173:5173"
+    environment:
+      - BUN_ENV=development
+    volumes:
+      - .:/app
+    command: sh -c "bun install && bun run dev -- --host"
+    restart: unless-stopped

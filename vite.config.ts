@@ -5,6 +5,10 @@ import svgr from 'vite-plugin-svgr';
 export default defineConfig({
    plugins: [react(),svgr()],
    server: {
+    host: true, // allows external access
+    allowedHosts: [
+      'app-smart-bin.techsure.xyz'
+    ],
     proxy: {
       '/api': {
         target: 'https://api-smart-bin.techsure.xyz', 
