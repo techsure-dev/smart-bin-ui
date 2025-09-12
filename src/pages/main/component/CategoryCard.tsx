@@ -6,7 +6,6 @@ const {Text} = Typography
 interface CategoryCardProps {
   image: string;
   header: string;
-  title: string;
   bgColor?: string;     
   iconColor?: string;   
   textColor?: string;  
@@ -15,7 +14,6 @@ interface CategoryCardProps {
 const CategoryCard = ({
   image,
   header,
-  title,
   bgColor = "#F0F0F0",
   iconColor = "#000",
   textColor = "#000",
@@ -29,8 +27,8 @@ const CategoryCard = ({
        <div
         className="flex items-center justify-center mb-2"
         style={{
-          width: "144px", 
-          height: "144px", 
+          width: "174px", 
+          height: "160px", 
           overflow: "hidden",
         }}
       >
@@ -52,16 +50,13 @@ const CategoryCard = ({
         style={{
           backgroundColor: bgColor,
           width: "175px",
-          height: "144px",
+          height: "267px",
           borderRadius: "8px",
           textAlign: "center",
         }}
       >
-        <Text className="text-heading-s font-bold" style={{ color: textColor }}>
+        <Text className="text-heading-xs font-bold" style={{ color: textColor }}>
           {header}
-        </Text>
-        <Text className="text-label-m" style={{ color: textColor }}>
-          {title}
         </Text>
       </Flex>
     </Flex>

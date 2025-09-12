@@ -11,9 +11,9 @@ interface AIProfileAnimationProps {
 }
 
 const AIProfileAnimation = ({
-  top = "12%",
-  left = "5%",
-  scale = 0.7,
+  top = "34%",
+  left = "38%",
+  scale = 1,
   duration = 1.5,
 }: AIProfileAnimationProps) => {
   const [showOverlay, setShowOverlay] = useState(true);

@@ -1,4 +1,5 @@
-import { Button, Flex, Typography } from "antd";
+import { Button, Flex, Typography, Spin } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 import { useEffect, useRef, useState } from "react";
 import { useCamera } from "../../hook/useCamera"; 
 import { useLocation, useNavigate } from "react-router-dom"; 
@@ -14,7 +15,8 @@ const ScanPage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const navigate = useNavigate();
   const location = useLocation(); 
-    const [errorMessage, setErrorMessage] = useState<string>()
+  const [errorMessage, setErrorMessage] = useState<string>();
+  const [loadingCamera, setLoadingCamera] = useState(true); 
 
   useEffect(() => {
     if (devices.length > 0) {
@@ -22,14 +24,27 @@ const ScanPage = () => {
       startCamera(usbCamera.deviceId);
     }
   }, [devices]);
-  
-   useEffect(() => {
-  const state = location.state as { toastMessage?: string };
-  if (state?.toastMessage) {
-    setErrorMessage(state.toastMessage); 
-    window.history.replaceState({}, document.title); 
-  }
-}, [location.state]);
+
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleCanPlay = () => setLoadingCamera(false); 
+    video.addEventListener("canplay", handleCanPlay);
+
+    return () => {
+      video.removeEventListener("canplay", handleCanPlay);
+    };
+  }, [videoRef]);
+
+  useEffect(() => {
+    const state = location.state as { toastMessage?: string };
+    if (state?.toastMessage) {
+      setErrorMessage(state.toastMessage); 
+      window.history.replaceState({}, document.title); 
+    }
+  }, [location.state]);
 
   const captureAndClassify = () => {
     if (!videoRef.current || !canvasRef.current) return;
@@ -53,23 +68,37 @@ const ScanPage = () => {
     }, "image/jpeg");
   };
 
+  const customIcon = <LoadingOutlined style={{ fontSize: 200, color: "#F16323" }} spin />;
+
   return (
     <Flex
       className="w-full h-screen flex items-center justify-center relative bg-white"
       style={{ backgroundImage: `url(${bg})`, backgroundSize: "cover", backgroundPosition: "center" }}
     >
-      <Flex vertical className="absolute top-48 items-center z-20">
+      {loadingCamera && (
+        <Spin
+          indicator={customIcon} 
+          tip="Connecting to camera..."
+          className="absolute z-50"
+          style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}
+        />
+      )}
+
+      <Flex vertical className="absolute top-48 items-center justify-center z-20">
         <Text className="font-bold text-heading-xl text-text-light">
           วางขยะให้อยู่ในกรอบ
+        </Text>
+        <Text className="font-bold text-heading-s text-text-light">
+          Keep the trash inside the circle.
         </Text>
       </Flex>
 
       <img src={dot} alt="dot" className="absolute w-[1260px] h-[1260px] object-contain z-10 animate-floatUpDown" />
-      <img src={arrow_left} alt="left" className="absolute left-[calc(50%-600px)] top-1/2 transform -translate-y-1/2 w-[260px] h-[260px] z-20 cursor-pointer animate-leftToRight" />
-      <img src={arrow_right} alt="right" className="absolute right-[calc(50%-600px)] top-1/2 transform -translate-y-1/2 w-[260px] h-[260px] z-20 cursor-pointer animate-rightToLeft" />
+      <img src={arrow_left} alt="left" className="absolute left-[calc(43%-600px)] top-1/2 transform -translate-y-1/2 w-[260px] h-[260px] z-20 cursor-pointer animate-leftToRight" />
+      <img src={arrow_right} alt="right" className="absolute right-[calc(45%-600px)] top-1/2 transform -translate-y-1/2 w-[260px] h-[260px] z-20 cursor-pointer animate-rightToLeft" />
 
-      <div className="absolute w-[600px] h-[600px] rounded-full overflow-hidden flex items-center justify-center z-30 border-[14px] border-[#AF6214]">
-        <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted />
+      <div className="absolute w-[720px] h-[720px] rounded-full overflow-hidden flex items-center justify-center z-30 border-[14px] border-[#AF6214]">
+        <video ref={videoRef} className="w-full h-full object-cover bg-white" autoPlay muted />
       </div>
 
       <canvas ref={canvasRef} className="hidden" />
@@ -85,12 +114,13 @@ const ScanPage = () => {
         </div>
       )}
 
-
-      <Button 
-        onClick={captureAndClassify} 
-        className="h-[120px] text-heading-xl absolute bottom-40 bg-[#AF6214] text-white px-6 py-3 rounded-lg z-40">
-          Scan
-      </Button>
+      {!loadingCamera && (
+        <Button 
+          onClick={captureAndClassify} 
+          className="h-[120px] text-heading-xl absolute bottom-40 bg-[#AF6214] text-white px-6 py-3 rounded-lg z-40">
+            Scan
+        </Button>
+      )}
     </Flex>
   );
 };

@@ -1,5 +1,5 @@
 import { Flex, Button, Input, Typography } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { PhoneOutlined} from "@ant-design/icons";
 import inputScoreImage from "../../../assets/images/input_score.png";
 
 const { Text } = Typography;
@@ -22,20 +22,27 @@ const InputScore = ({ inputValue, onKeyPress, onSkip, onSubmit }:InputScoreProps
       />
 
       {/* Instructions */}
-      <Text className="font-bold text-heading-xl text-center">ขอบคุณที่รักษ์โลก</Text>
-      <Text className="font-bold text-heading-l text-center">
-        กรอกรหัสนักศึกษาเพื่อรับ{" "}
-        <span className="text-text-brand">+1 คะแนน</span> เลย!
-      </Text>
+      <Flex vertical className="items-center justify-center">
+        <Text className="font-bold text-heading-l">
+          ขอบคุณที่รักษ์โลก
+        </Text>
+        <Text className="font-bold text-heading-s">
+          กรอกเบอร์โทรศัพท์เพื่อรับ{" "}
+          <span className="text-text-brand">+1 คะแนน</span> เลย!
+        </Text>
+        <Text className="font-bold text-heading-xs text-text-subtitle">
+          Enter your phone number to get +65 greenpoints!
+        </Text>
+      </Flex>
 
       {/* Input */}
       <Input
         value={inputValue}
         readOnly
-        prefix={<UserOutlined style={{ fontSize: "42px", color: "#5A6169" }} />}
-        className="text-heading-l w-[430px] h-[120px] text-text-brand mt-20 border-[3px] border-[#F97316] rounded-xl px-8"
+        prefix={<PhoneOutlined style={{ fontSize: "42px", color: "#5A6169" }} />}
+        className="text-heading-xs w-[430px] h-[120px] text-text-brand mt-20 border-[3px] border-[#F97316] rounded-xl px-8"
         style={{ textAlign: "left" }}
-        placeholder="กรอกรหัสนักศึกษา"
+        placeholder="กรอกเบอร์โทรศัพท์"
       />
 
       {/* Numeric Keypad */}
@@ -52,7 +59,7 @@ const InputScore = ({ inputValue, onKeyPress, onSkip, onSubmit }:InputScoreProps
                 <Button
                   key={i}
                   type="dashed"
-                  className="w-[100px] h-[100px] text-heading-l font-bold rounded-full bg-white text-text-brand transition-all duration-300"
+                  className="w-[100px] h-[100px] text-heading-xs font-bold rounded-full bg-white text-text-brand transition-all duration-300"
                   style={{ boxShadow: "0 8px 20px rgba(241, 99, 35, 0.2)" }}
                   onClick={() => onKeyPress(key)}
                 >
@@ -74,7 +81,10 @@ const InputScore = ({ inputValue, onKeyPress, onSkip, onSubmit }:InputScoreProps
           style={{ boxShadow: "0 4px 20px rgba(241, 99, 35, 0.5)" }}
           onClick={onSkip}
         >
-          ข้าม
+         <Flex vertical>
+         <Text className="text-heading-s text-text-brand ">ข้าม</Text>
+         <Text className="text-sub-heading-xs text-text-brand ">(Skip)</Text>
+         </Flex>
         </Button>
         <Button
           type="primary"
@@ -82,7 +92,10 @@ const InputScore = ({ inputValue, onKeyPress, onSkip, onSubmit }:InputScoreProps
           style={{ boxShadow: "0 4px 20px rgba(241, 99, 35, 0.5)" }}
           onClick={onSubmit}
         >
-          ยืนยัน
+        <Flex vertical>
+         <Text className="text-heading-s text-white ">ยืนยัน</Text>
+         <Text className="text-sub-heading-xs text-white ">(Confirm)</Text>
+         </Flex>
         </Button>
       </Flex>
     </Flex>

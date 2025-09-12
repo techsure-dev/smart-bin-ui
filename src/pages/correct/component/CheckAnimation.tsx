@@ -1,6 +1,7 @@
 
 import { motion } from "framer-motion";
-import { CheckOutlined } from "@ant-design/icons";
+import CheckIcon from "../../../assets/icons/Vector.svg?react"
+
 
 interface CheckAnimationProps {
   reverse: boolean;
@@ -41,7 +42,7 @@ const CheckAnimation = ({ reverse }:CheckAnimationProps) => {
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="relative flex items-center justify-center w-24 h-24 rounded-full bg-white"
       >
-        <CheckOutlined style={{ fontSize: 120, color: "#00D774" }} />
+        <CheckIcon style={{ fontSize: 150, color: "#00D774" }} />
       </motion.div>
     </div>
   );

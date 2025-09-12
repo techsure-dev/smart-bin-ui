@@ -34,10 +34,8 @@ const CorrectPage= () => {
 
   return (
     <Flex className="w-screen h-screen items-center justify-center relative bg-white overflow-hidden">
-      {/* Background circles */}
       <BackgroundCircles reverse={reverse} />
 
-      {/* White circles and check icon */}
       {showCheck && <CheckAnimation reverse={reverse} />}
 
       {showText && (
@@ -51,26 +49,39 @@ const CorrectPage= () => {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="flex flex-col items-center mt-80"
         >
-          <Text className="font-bold text-hero">มาแยกขยะกันไหม?</Text>
-          <Text className="font-bold text-hero">
-            เดี๋ยวเราช่วย <span className="text-text-brand">แยก</span> เอง
-          </Text>
+          <Flex vertical className="justify-center items-center">
+            <Text className="font-bold text-hero">มาแยกขยะกันไหม?</Text>
+            <Text className="font-bold text-hero">
+              เดี๋ยวเราช่วย <span className="text-text-brand">แยก</span> เอง
+            </Text>
+            <Text className="font-bold text-heading-m text-text-subtitle">
+              Any more trash? I can help sort it.
+            </Text>
+          </Flex>
           <Flex vertical className="mt-56 gap-24">
             <Button
               type="default"
-              className="h-[120px] rounded-full animate-scalePulse text-text-brand text-heading-l font-bold flex px-16"
+              className="h-[150px] w-[620px] rounded-full animate-scalePulse text-text-brand text-heading-l font-bold flex px-16"
               style={{ boxShadow: "0 4px 20px rgba(241, 99, 35, 0.5)" }}
               onClick={() => navigate("/scan")}
             >
-              ทิ้งขยะเพิ่มเติม
+              <Flex vertical>
+                <Text className="text-heading-s text-text-brand ">ทิ้งขยะเพิ่มเติม</Text>
+                <Text className="text-sub-heading-xs text-text-brand ">(More trash to sort)</Text>
+              </Flex>
+            
             </Button>
             <Button
               type="primary"
-              className="h-[120px] rounded-full animate-scalePulse bg-background-brand text-white text-heading-l font-bold flex px-16"
+              className="h-[150px] w-[620px] rounded-full animate-scalePulse bg-background-brand text-white text-heading-l font-bold flex px-16"
               style={{ boxShadow: "0 4px 20px rgba(241, 99, 35, 0.5)" }}
               onClick={() => navigate("/score")}
             >
-              ทิ้งขยะครบหมดแล้ว
+              <Flex vertical>
+                <Text className="text-heading-s text-text-light ">ทิ้งขยะครบหมดแล้ว</Text>
+                <Text className="text-sub-heading-xs text-text-light ">(All done)</Text>
+              </Flex>
+             
             </Button>
           </Flex>
         </motion.div>

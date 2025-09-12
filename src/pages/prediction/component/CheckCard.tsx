@@ -13,9 +13,12 @@ interface CheckCardProps {
 const CheckCard = ({ onCorrect, onWrong }: CheckCardProps) => {
   return (
     <div className="relative bg-[#F0EFEF] rounded-tl-[16px] rounded-bl-[16px] rounded-br-[16px] shadow-md">
-      <Flex className="flex-col items-center justify-center w-[300px] h-[150px] p-4">
-        <Text className="text-center text-heading-s font-bold">
+      <Flex className="flex-col items-center justify-center w-[310px] h-[215px] p-4">
+        <Text className="text-center text-heading-xs font-bold">
           ผมแยกประเภท<br />ถูกต้องไหมครับ?
+        </Text>
+        <Text className="text-center text-heading-xs font-bold text-text-subtitle">
+          Is It correct?
         </Text>
       </Flex>
 

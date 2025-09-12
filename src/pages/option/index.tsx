@@ -11,11 +11,11 @@ const { Text } = Typography;
 
 
 const allCategories: WasteCategory[] = [
-  "เชื้อเพลิงขยะ",
+  "ขยะกำพร้า",
   "ขยะทั่วไป",
   "ขวดพลาสติก",
   "แก้ว โลหะ อะลูมิเนียม",
-  "ขยะอาหาร"
+  "ขยะอันตราย"
 ];
 
 const OptionPage = () => {
@@ -63,18 +63,30 @@ const OptionPage = () => {
       <AIProfileAnimation />
 
       <motion.div
-        initial={{ x: -500, opacity: 0 }} 
-        animate={{ x: 0, opacity: 1 }}   
+        initial={{ y: 500, opacity: 0 }}  
+        animate={{ y: 0, opacity: 1 }}    
         transition={{ type: "spring", duration: 3 }}
-        className="left-[10%] top-[8%] relative bg-[#F0EFEF] rounded-tr-[16px] rounded-tl-[16px] rounded-br-[16px] shadow-md px-10 py-5"
+        className="relative bg-[#F0EFEF] rounded-2xl shadow-md px-10 py-5 mt-72"
       >
-        <Text className="text-heading-l font-bold text-center">
-          เลือกถังขยะที่ถูกต้องให้หน่อยครับ
-        </Text>
+        <Flex vertical className="relative items-center">
+          <Text className="text-heading-m font-bold text-center">
+            เลือกถังขยะที่ถูกต้องให้หน่อยครับ
+          </Text>
+          <Text className="text-heading-s font-bold text-center text-text-subtitle">
+            Please choose the correct trash bin
+          </Text>
+
+          <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-0 h-0 
+            border-l-[80px] border-l-transparent 
+            border-r-[80px] border-r-transparent 
+            border-t-[80px] border-t-[#F0EFEF]">
+          </div>
+        </Flex>
       </motion.div>
 
 
-      <Flex className="grid grid-cols-4 justify-center mt-auto ">
+
+      <Flex className="grid grid-cols-4 justify-center mt-auto gap-6 px-6 pb-6">
         {options.map((category) => {
           const waste = wasteMap[category];
           return (

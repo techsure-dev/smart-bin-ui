@@ -17,7 +17,7 @@ const ScorePage = () => {
     if (key === "x") {
       setInputValue((prev) => prev.slice(0, -1));
     } else {
-      setInputValue((prev) => (prev.length < 8 ? prev + key : prev));
+      setInputValue((prev) => (prev.length < 10 ? prev + key : prev));
     }
   };
 

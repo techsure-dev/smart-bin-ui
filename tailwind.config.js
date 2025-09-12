@@ -76,32 +76,19 @@ export default {
         },
       },
       fontSize: {
-        'hero': ['120px', { lineHeight: '144px' }],
-        'heading-xl': ['96px', { lineHeight: '120px' }],
-        'heading-l': ['60px', { lineHeight: '68px' }],
-        'heading-m': ['40px', { lineHeight: '52px' }],
-        'heading-s': ['32px', { lineHeight: '40px' }],
-        'heading-xs': ['16px', { lineHeight: '24px' }],
+          'hero': ['120px', { lineHeight: '144px' }],
 
-        'subheading-l': ['18px', { lineHeight: '28px' }],
-        'subheading-m': ['16px', { lineHeight: '24px' }],
-        'subheading-s': ['14px', { lineHeight: '20px' }],
+          'heading-xl': ['96px', { lineHeight: '115px' }],
+          'heading-l': ['88px', { lineHeight: '106px' }],
+          'heading-m': ['70px', { lineHeight: '84px' }],
+          'heading-s': ['56px', { lineHeight: '67px' }],
+          'heading-xs': ['40px', { lineHeight: '48px' }],
 
-        'label-l': ['20px', { lineHeight: '28px' }],
-        'label-m': ['16px', { lineHeight: '24px' }],
-        'label-s': ['14px', { lineHeight: '20px' }],
-        'label-xs': ['12px', { lineHeight: '16px' }],
+          'sub-heading-xs': ['32px', { lineHeight: '38px' }],
 
-        'body-l': ['18px', { lineHeight: '28px' }],
-        'body-m': ['16px', { lineHeight: '24px' }],
-        'body-s': ['14px', { lineHeight: '20px' }],
-
-        'table-m': ['13px', { lineHeight: '20px' }],
-        'table-s': ['12px', { lineHeight: '20px' }],
-        
-        'caption-l': ['14px', { lineHeight: '20px' }],
-        'caption-m': ['12px', { lineHeight: '16px' }],
-        'caption-s': ['10px', { lineHeight: '14px' }],
+          'label-l': ['64px', { lineHeight: '77px' }],
+          'label-m': ['56px', { lineHeight: '67px' }],
+          'label-s': ['24px', { lineHeight: '29px' }]
       },
       keyframes: {
         scalePulse: {

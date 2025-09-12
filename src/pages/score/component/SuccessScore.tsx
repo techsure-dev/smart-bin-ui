@@ -20,22 +20,30 @@ const SuccessScore = ({ countdown, skipped = false }: SuccessScoreProps) => {
           alt="Show Score"
           className="w-[560px] h-[430px] object-contain"
         />
-        <Text className="font-bold text-heading-xl text-center mt-10 px-32">
-          ไม่มีใครรักโลกเท่า <span className="text-text-brand">ลิงปั้น</span> แล้วล่ะ ✨
-        </Text>
+        <Flex vertical className="items-center justify-center">
+          <Text className="font-bold text-heading-xl text-center mt-10 px-32">
+            ไม่มีใครรักโลกเท่า <span className="text-text-brand">ลิงปั้น</span> แล้วล่ะ ✨
+          </Text>
+            <Text className="font-bold text-heading-xs text-text-subtitle">
+            No one loves the Earth more than Punpun.
+          </Text>
+        </Flex>
         {!skipped && (
-          <Flex className="w-[600px] h-[130px] bg-background-light rounded-full items-center justify-center mt-20">
-            <Text className="text-heading-l text-center text-text-title">
+          <Flex vertical className="w-[600px] h-fit bg-background-light rounded-full items-center justify-center mt-20 p-4">
+            <Text className="text-heading-s text-center text-text-title">
               คะแนนสะสม{" "}
               <span className="text-text-brand font-bold">654</span> คะแนน
+            </Text>
+             <Text className="text-heading-xs font-bold text-center text-text-subtitle">
+              You have 654 points.
             </Text>
           </Flex>
         )}
       </Flex>
 
       <Flex vertical className="items-center mt-auto mb-64">
-        <Text className="font-bold text-heading-l text-center text-gray-500">
-          กำลังกลับสู่หน้าหลัก (<span className="text-text-brand font-bold">{countdown}</span>)
+        <Text className="font-bold text-heading-xs text-center text-text-subtitle">
+           กำลังกลับสู่หน้าหลัก (Back to home) (<span className="text-text-brand font-bold">{countdown}</span>)
         </Text>
       </Flex>
     </Flex>

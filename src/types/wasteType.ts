@@ -1,15 +1,15 @@
 
-import rdf from "../assets/images/rdf.png";
-import general from "../assets/images/general_waste.png";
-import plastic from "../assets/images/plastic_bottle.png";
-import glass from "../assets/images/glass_can.png";
-import food from "../assets/images/food_waste.png";
+import rdf from "../assets/images/IconWaste/RDF.png";
+import general from "../assets/images/IconWaste/General Waste.png";
+import plastic from "../assets/images/IconWaste/Plastic Bottle.png";
+import glass from "../assets/images/IconWaste/Glass-Can-Metal-Aluminium.png";
+import hazardous from "../assets/images/IconWaste/Hazardous Waste.png";
 
-import redBin from "../assets/images/rdf_bin.png"
-import generalBin from "../assets/images/general_bin.png";
-import plasticBin from "../assets/images/plastic_bin.png";
-import glassBin from "../assets/images/glass_bin.png";
-import foodBin from "../assets/images/food_bin.png";
+import redBin from "../assets/images/Bin/rdf.png"
+import generalBin from "../assets/images/Bin/general.png";
+import plasticBin from "../assets/images/Bin/plastic.png";
+import glassBin from "../assets/images/Bin/glass.png";
+import hazardousBin from "../assets/images/Bin/hazardous-waste.png";
 
 export interface WasteType {
   image: string;
@@ -21,15 +21,15 @@ export interface WasteType {
 }
 
 export type WasteCategory =
-  | "เชื้อเพลิงขยะ"
+  | "ขยะกำพร้า"
   | "ขยะทั่วไป"
   | "ขวดพลาสติก"
   | "แก้ว โลหะ อะลูมิเนียม"
-  | "ขยะอาหาร"
+  | "ขยะอันตราย"
   
 
 export const wasteMap: Record<string, WasteType> = {
-  "เชื้อเพลิงขยะ": {
+  "ขยะกำพร้า": {
     image: rdf,
     binImage: redBin,
     bgColor: "#838383",
@@ -61,12 +61,12 @@ export const wasteMap: Record<string, WasteType> = {
     iconColor: "#F5BE0C",
     description: "Glass / Can / Metal / Aluminium",
   },
-  "ขยะอาหาร": {
-    image: food,
-    binImage: foodBin,
-    bgColor: "#00712C",
+  "ขยะอันตราย": {
+    image: hazardous,
+    binImage: hazardousBin,
+    bgColor: "#E32526",
     textColor: "#FEEFE9",
-    iconColor: "#00712C",
-    description: "Food Waste",
+    iconColor: "#E32526",
+    description: "Hazardous Waste",
   },
 };

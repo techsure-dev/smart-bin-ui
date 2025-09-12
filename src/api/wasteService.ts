@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "/api"; 
+export const BASE_URL = "/api";
 const API_KEY = "power2edit"; 
 
 export interface WasteClassificationResult {
@@ -25,9 +25,13 @@ export const classifyWaste = async (file: File): Promise<WasteClassificationResu
       }
     );
     return response.data;
-  } catch (error) {
-    console.error("Error classifying waste:", error);
-    throw error;
-  }
+      } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        console.error(error.response?.data, error.response?.status);
+      } else {
+        console.error(error);
+      }
+      throw error;
+    }
 };
 

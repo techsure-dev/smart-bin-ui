@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import loading from "../../assets/images/Loading.png";
+import bgLoading from "../../assets/images/Bg/BG_Smart_Bin.jpg"
 import circle from "../../assets/images/noisy-gradients.png";
 import ai_profile from "../../assets/images/AIProfile.png";
 import { classifyWaste } from "../../api/wasteService";
@@ -8,11 +8,11 @@ import { Flex } from "antd";
 import type { WasteCategory } from "../../types/wasteType";
 
 const validWasteCategories: WasteCategory[] = [
-  "เชื้อเพลิงขยะ",
+  "ขยะกำพร้า",
   "ขยะทั่วไป",
   "ขวดพลาสติก",
   "แก้ว โลหะ อะลูมิเนียม",
-  "ขยะอาหาร",
+  "ขยะอันตราย",
 ];
 
 const LoadingPage = () => {
@@ -63,7 +63,7 @@ const LoadingPage = () => {
     <Flex
       className="w-full h-screen flex-col items-center justify-center relative"
       style={{
-        backgroundImage: `url(${loading})`,
+        backgroundImage: `url(${bgLoading})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}

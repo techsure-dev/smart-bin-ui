@@ -45,11 +45,17 @@ const SelectWastePage = () => {
         transition={{ delay: 0.5, duration: 0.2 }}
         className="flex flex-col items-center w-full"
       >
-        <Text className="text-heading-xl font-bold mt-40">
+         <Flex vertical className="items-center justify-center mt-10">
+          <Text className="text-heading-xl font-bold">
           โปรดทิ้งขยะตามคำแนะนำ
-        </Text>
+          </Text>
+          <Text className="text-heading-s font-bold">
+            Sort your trash and throw it in the right bin
+          </Text>
+        </Flex>
 
-        <div className="relative z-20 mt-24">
+
+        <div className="relative z-20 mt-12">
           <WasteCard
             item={item}
             type={selectedCategory}
@@ -87,14 +93,6 @@ const SelectWastePage = () => {
         />
       </motion.div>
 
-    
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.3, duration: 0.8 }}
-        className="absolute mt-[-250px]" 
-      >
-      </motion.div>
     </Flex>
   );
 };

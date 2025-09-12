@@ -38,13 +38,13 @@ const WasteBinCard = ({
         }}
       >
         <Text
-          className="text-heading-l font-bold mt-20" 
+          className="text-heading-m font-bold mt-20" 
           style={{ color: textColor }}
         >
           {type}
         </Text>
         <Text
-          className="text-heading-s mt-1 font-bold"
+          className="text-sub-heading-xs"
           style={{ color: textColor }}
         >
           {description}

@@ -11,8 +11,8 @@ interface AIProfileAnimationProps {
 }
 
 const AIProfileAnimation = ({
-  top = "18%",
-  left = "22%",
+  top = "25%",
+  left = "18%",
   scale = 0.7,
   duration = 1.5,
 }: AIProfileAnimationProps) => {

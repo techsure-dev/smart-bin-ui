@@ -51,11 +51,17 @@ const PredictionPage = () => {
         <Header />
       </Flex>
 
-      <Text className="text-heading-xl font-bold mt-40">
-        โปรดทิ้งขยะตามคำแนะนำ
-      </Text>
+      <Flex vertical className="items-center justify-center mt-10">
+          <Text className="text-heading-xl font-bold">
+          โปรดทิ้งขยะตามคำแนะนำ
+        </Text>
+        <Text className="text-heading-s font-bold">
+          Sort your trash and throw it in the right bin
+        </Text>
+      </Flex>
 
-      <Flex className="flex-wrap justify-center gap-6 mt-36 relative w-full">
+
+      <Flex className="flex-wrap justify-center gap-6 relative w-full mt-12">
         {Object.entries(parsedResult).map(([item, type]) => {
           const waste = wasteMap[type];
           if (!waste) return null;
@@ -95,7 +101,7 @@ const PredictionPage = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="absolute top-[36%] left-[5%] -translate-y-1/2 z-40"
+                  className="absolute top-[41%] left-[4%] -translate-y-1/2 z-40"
                 >
                   <CheckCard
                     onCorrect={() => navigate("/correct")}
