@@ -108,7 +108,7 @@ const ScanPage = () => {
           className="absolute w-full flex items-center justify-center z-40 pointer-events-none px-20"
           style={{ bottom: "400px" }}
         >
-          <Text className="text-white text-heading-l font-bold bg-black/40 px-4 py-2 rounded text-center">
+          <Text className="text-white text-heading-m font-bold bg-black/40 px-4 py-2 rounded text-center">
             {errorMessage}
           </Text>
         </div>

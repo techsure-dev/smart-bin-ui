@@ -6,6 +6,7 @@ import OptionPage from "../pages/option";
 import ScorePage from "../pages/score";
 import LoadingPage from "../pages/loading";
 import CorrectPage from "../pages/correct";
+import Maintain from "../pages/maintain";
 
 const routes = [
   {
@@ -39,6 +40,10 @@ const routes = [
   {
     path: "/correct",
     element: <CorrectPage/>,
+  },
+  {
+    path: "/maintain",
+    element: <Maintain/>,
   },
 ];
 

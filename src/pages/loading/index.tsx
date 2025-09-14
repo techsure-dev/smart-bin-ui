@@ -31,29 +31,48 @@ const LoadingPage = () => {
     isProcessing.current = true;
 
     const classify = async () => {
+  try {
+    const result = await classifyWaste(state.file!);
+    console.log("API raw result:", result.output);
+
+    let parsedOutput: any = [];
+
+    if (typeof result.output === "string") {
+      // remove ```json and ``` if they exist
+      const cleaned = result.output.replace(/```json|```/g, "").trim();
+
       try {
-        const result = await classifyWaste(state.file!);
-        const output = result.output || "";
-        const parsed: Record<string, string> = {};
+        const parsed = JSON.parse(cleaned);
 
-        output.split(",").forEach((entry: string) => {
-          const [item, type] = entry.split(":").map(str => str.trim());
-          if (item && type) parsed[item] = type;
-        });
-        
-        const allValid = Object.values(parsed).every(type => validWasteCategories.includes(type as WasteCategory));
-
-        if (!allValid || Object.keys(parsed).length === 0) {
-          navigate("/scan", { state: { toastMessage: "ไม่สามารถจำแนกประเภทขยะนี้ได้ กรุณาลองสแกนอีกครั้ง" } });
-          return;
-        }
-        navigate("/prediction", { state: { result } });
-
+        // ensure array
+        parsedOutput = Array.isArray(parsed) ? parsed : [parsed];
       } catch (err) {
-        console.error(err);
-        navigate("/scan", { state: { toastMessage: "เกิดข้อผิดพลาด กรุณาลองใหม่" } });
+        console.error("❌ JSON parse failed:", err);
+        parsedOutput = [];
       }
-    };
+    }
+
+    console.log("Parsed output:", parsedOutput);
+
+    const allValid = parsedOutput.every((entry: { type_th: string; }) =>
+      validWasteCategories.includes(entry.type_th as WasteCategory)
+    );
+    console.log("Validation:", { allValid, length: parsedOutput.length });
+
+    if (!allValid || parsedOutput.length === 0) {
+      navigate("/scan", {
+        state: { toastMessage: "ไม่สามารถจำแนกประเภทขยะนี้ได้ กรุณาลองสแกนอีกครั้ง" },
+      });
+      return;
+    }
+
+    navigate("/prediction", { state: { result: parsedOutput } });
+  } catch (err) {
+    console.error(err);
+    navigate("/scan", { state: { toastMessage: "เกิดข้อผิดพลาด กรุณาลองใหม่" } });
+  }
+};
+
 
     classify();
   }, [state, navigate]);

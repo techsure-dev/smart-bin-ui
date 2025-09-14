@@ -11,7 +11,7 @@ const ScorePage = () => {
   const [inputValue, setInputValue] = useState<string>("");
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [skipped, setSkipped] = useState<boolean>(false);
-  const [countdown, setCountdown] = useState<number>(5);
+  const [countdown, setCountdown] = useState<number>(10);
 
   const handleKeyPress = (key: string) => {
     if (key === "x") {

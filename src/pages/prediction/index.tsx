@@ -6,43 +6,105 @@ import { wasteMap } from "../../types/wasteType";
 import ArrowIcon from "../../assets/icons/arrow.svg?react";
 import WasteBinCard from "./component/WasteBinCard";
 import AIProfileAnimation from "./component/AIProfileAnimation";
-import { useEffect, useState } from "react";
 import CheckCard from "./component/CheckCard";
 import { motion } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
+import { textToSpeech } from "../../api/audioWaste";
 
 const { Text } = Typography;
 
 const PredictionPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const state = location.state as { result?: Record<string, any> };
+  const state = location.state as {
+    result?: { item_th: string; item_en: string; type_th: string; type_en: string }[];
+  };
+
+  const results = state?.result || [];
+
   const [showCheckCard, setShowCheckCard] = useState(false);
+  const [isEnglish, setIsEnglish] = useState(false);
+  const [audioCache, setAudioCache] = useState<Record<string, { th: string; en: string }>>({});
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowCheckCard(true);
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, []);
+    const langInterval = setInterval(() => setIsEnglish(prev => !prev), 5000);
 
+    const showCheckTimer = setTimeout(() => setShowCheckCard(true), 1500);
 
-  if (!state?.result) {
+    const preloadAudio = async () => {
+      if (!results.length) return;
+      const cache: Record<string, { th: string; en: string }> = {};
+      for (const wasteItem of results) {
+        try {
+          const thBlob = await textToSpeech(`${wasteItem.item_th} ${wasteItem.type_th}`);
+          const enBlob = await textToSpeech(`${wasteItem.item_en} ${wasteItem.type_en}`);
+          cache[wasteItem.item_th] = {
+            th: URL.createObjectURL(thBlob),
+            en: URL.createObjectURL(enBlob),
+          };
+        } catch (err) {
+          console.error("TTS preload error:", err);
+        }
+      }
+      setAudioCache(cache);
+    };
+
+    preloadAudio();
+
+    return () => {
+      clearInterval(langInterval);
+      clearTimeout(showCheckTimer);
+    };
+  }, [results]);
+
+  useEffect(() => {
+    if (!results.length || Object.keys(audioCache).length === 0 || !audioRef.current) return;
+
+    let index = 0;
+
+    const playNext = async () => {
+      if (index >= results.length) return;
+
+      const wasteItem = results[index];
+      const audioTh = audioCache[wasteItem.item_th]?.th;
+      const audioEn = audioCache[wasteItem.item_th]?.en;
+
+      if (!audioTh || !audioEn) {
+        index++;
+        playNext();
+        return;
+      }
+
+      if (!audioRef.current) return;
+
+      // Play Thai audio
+      audioRef.current.src = audioTh;
+      await audioRef.current.play().catch(() => {});
+
+      audioRef.current.onended = async () => {
+        if (!audioRef.current) return;
+
+        // Play English audio
+        audioRef.current.src = audioEn;
+        await audioRef.current.play().catch(() => {});
+
+        audioRef.current.onended = () => {
+          index++;
+          playNext();
+        };
+      };
+    };
+
+    playNext();
+  }, [audioCache, results]);
+
+  if (!results.length) {
     return (
       <Flex className="w-full h-screen items-center justify-center">
         <Text className="text-heading-l font-bold">No result available</Text>
       </Flex>
     );
-  }
-
-  const { result } = state;
-
-  const parsedResult: Record<string, string> = {};
-  if (result.output) {
-    const entries = result.output.split(",");
-    entries.forEach((entry: string) => {
-      const [item, type] = entry.split(":").map((str: string) => str.trim());
-      if (item && type) parsedResult[item] = type;
-    });
   }
 
   return (
@@ -52,43 +114,36 @@ const PredictionPage = () => {
       </Flex>
 
       <Flex vertical className="items-center justify-center mt-10">
-          <Text className="text-heading-xl font-bold">
-          โปรดทิ้งขยะตามคำแนะนำ
-        </Text>
-        <Text className="text-heading-s font-bold">
-          Sort your trash and throw it in the right bin
-        </Text>
+        <Text className="text-heading-xl font-bold">โปรดทิ้งขยะตามคำแนะนำ</Text>
+        <Text className="text-heading-s font-bold">Sort your trash and throw it in the right bin</Text>
       </Flex>
 
-
       <Flex className="flex-wrap justify-center gap-6 relative w-full mt-12">
-        {Object.entries(parsedResult).map(([item, type]) => {
-          const waste = wasteMap[type];
+        {results.map((wasteItem, index) => {
+          const waste = wasteMap[wasteItem.type_th];
           if (!waste) return null;
 
           return (
-            <div key={item} className="flex flex-col items-center relative">
+            <div key={index} className="flex flex-col items-center relative">
               <div className="relative z-20">
                 <WasteCard
-                  item={item}
-                  type={type}
+                  item_th={wasteItem.item_th}
+                  item_en={wasteItem.item_en}
+                  type_th={wasteItem.type_th}
+                  type_en={wasteItem.type_en}
                   image={waste.image}
                   bgColor={waste.bgColor}
                   textColor={waste.textColor}
-                  description={waste.description}
                 />
               </div>
 
               <div className="mt-20">
-                <ArrowIcon
-                  className="h-[220px] w-[130px] animate-bounce"
-                  fill={waste.bgColor}
-                />
+                <ArrowIcon className="h-[220px] w-[130px] animate-bounce" fill={waste.bgColor} />
               </div>
 
               <WasteBinCard
-                key={type}
-                type={type}
+                key={wasteItem.type_th}
+                type={wasteItem.type_th}
                 description={waste.description}
                 binImage={waste.binImage}
                 bgColor={waste.bgColor}
@@ -96,6 +151,7 @@ const PredictionPage = () => {
               />
 
               <AIProfileAnimation />
+
               {showCheckCard && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -105,9 +161,7 @@ const PredictionPage = () => {
                 >
                   <CheckCard
                     onCorrect={() => navigate("/correct")}
-                    onWrong={() =>
-                      navigate("/option", { state: { result } })
-                    }
+                    onWrong={() => navigate("/option", { state: { result: results } })}
                   />
                 </motion.div>
               )}
@@ -115,6 +169,8 @@ const PredictionPage = () => {
           );
         })}
       </Flex>
+
+      <audio ref={audioRef} preload="auto" />
     </Flex>
   );
 };
