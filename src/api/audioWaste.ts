@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const BASE_URL = "/api";
+export const BASE_URL = "https://api-smart-bin.techsure.xyz";
 const API_KEY = "power2edit";
 
 export interface TTSResult {
