@@ -8,12 +8,16 @@ export interface TTSResult {
   audio_base64: string;
 }
 
-/**
- * @param text 
- * @returns {Promise<Blob>} 
- */
+let isRequestInProgress = false;
 
 export const textToSpeech = async (text: string): Promise<Blob> => {
+  if (isRequestInProgress) {
+    console.warn("TTS request already in progress. Please wait.");
+    return Promise.reject("Request in progress");
+  }
+
+  isRequestInProgress = true;
+
   try {
     const response = await axios.post<TTSResult>(
       `${BASE_URL}/tts-base64`,
@@ -28,8 +32,6 @@ export const textToSpeech = async (text: string): Promise<Blob> => {
     );
 
     const { audio_base64 } = response.data;
-
-
     const audioBytes = Uint8Array.from(atob(audio_base64), (c) =>
       c.charCodeAt(0)
     );
@@ -41,5 +43,7 @@ export const textToSpeech = async (text: string): Promise<Blob> => {
       console.error(error);
     }
     throw error;
+  } finally {
+    isRequestInProgress = false; 
   }
 };

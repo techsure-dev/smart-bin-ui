@@ -24,6 +24,7 @@ const MainPage = () => {
   const topRightClickCount = useRef(0);
   const topRightTimeout = useRef<NodeJS.Timeout | null>(null);
 
+console.log(VideoPr);
 
   useEffect(() => {
     const interval = setInterval(() => {

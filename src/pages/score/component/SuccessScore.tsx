@@ -58,7 +58,7 @@ const SuccessScore = ({ countdown, skipped = false }: SuccessScoreProps) => {
         <Flex vertical className="items-center justify-center">
           <Text className="font-bold text-heading-xl text-center mt-10 px-32">
             ไม่มีใครรักโลกเท่า{" "}
-            <Text className="text-text-brand">
+            <Text className="text-text-brand text-heading-xl font-bold">
               คุณวัราภรณ์
             </Text>
             {"\n"}แล้วล่ะ ✨
