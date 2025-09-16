@@ -7,8 +7,8 @@ import bg from "../../assets/images/bg.png";
 import dot from "../../assets/images/Dot.png";
 import arrow_left from "../../assets/images/arrow_left.png";
 import arrow_right from "../../assets/images/arrow_right.png";
-import scanThSound from "../../assets/sound/2-วางขยะให้อ.mp3"
-import scanEnSound from "../../assets/sound/5-Keepthetra.mp3"
+import scanThSound from "../../assets/sound/2-วางขยะให้อ.mp3";
+import scanEnSound from "../../assets/sound/5-Keepthetra.mp3";
 
 const { Text } = Typography;
 
@@ -22,7 +22,7 @@ const ScanPage = () => {
   const thAudioRef = useRef<HTMLAudioElement | null>(null);
   const enAudioRef = useRef<HTMLAudioElement | null>(null);
 
-
+  // Start camera
   useEffect(() => {
     if (devices.length > 0) {
       const usbCamera = devices.find(d => !d.label.toLowerCase().includes("built-in")) || devices[0];
@@ -30,7 +30,7 @@ const ScanPage = () => {
     }
   }, [devices]);
 
-
+  // Camera loaded
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -38,11 +38,10 @@ const ScanPage = () => {
     const handleCanPlay = () => setLoadingCamera(false); 
     video.addEventListener("canplay", handleCanPlay);
 
-    return () => {
-      video.removeEventListener("canplay", handleCanPlay);
-    };
+    return () => video.removeEventListener("canplay", handleCanPlay);
   }, [videoRef]);
 
+  // Handle toast message
   useEffect(() => {
     const state = location.state as { toastMessage?: string };
     if (state?.toastMessage) {
@@ -51,6 +50,7 @@ const ScanPage = () => {
     }
   }, [location.state]);
 
+  // Load and play audio
   useEffect(() => {
     thAudioRef.current = new Audio(scanThSound);
     enAudioRef.current = new Audio(scanEnSound);
@@ -68,42 +68,41 @@ const ScanPage = () => {
     };
   }, []);
 
+  // Auto-back timer
   useEffect(() => {
-  const thAudio = thAudioRef.current;
-  const enAudio = enAudioRef.current;
-  if (!thAudio || !enAudio) return;
+    const thAudio = thAudioRef.current;
+    const enAudio = enAudioRef.current;
+    if (!thAudio || !enAudio) return;
 
-  let autoBackTimer: NodeJS.Timeout;
+    let autoBackTimer: NodeJS.Timeout;
 
-  const startAutoBackTimer = () => {
-
-    autoBackTimer = setTimeout(() => {
-      navigate("/"); 
-    }, 5000);
-  };
-  thAudio.play().catch(err => console.log("Audio play error:", err));
-  thAudio.onended = () => {
-    enAudio.play().catch(err => console.log("Audio play error:", err));
-    enAudio.onended = () => {
-      startAutoBackTimer(); 
+    const startAutoBackTimer = () => {
+      autoBackTimer = setTimeout(() => navigate("/"), 5000);
     };
-  };
-  return () => {
-    clearTimeout(autoBackTimer);
-    thAudio.pause();
-    thAudio.currentTime = 0;
-    enAudio.pause();
-    enAudio.currentTime = 0;
-  };
-}, [navigate]);
 
+    thAudio.play().catch(err => console.log("Audio play error:", err));
+    thAudio.onended = () => {
+      enAudio.play().catch(err => console.log("Audio play error:", err));
+      enAudio.onended = () => startAutoBackTimer();
+    };
 
+    return () => {
+      clearTimeout(autoBackTimer);
+      thAudio.pause();
+      thAudio.currentTime = 0;
+      enAudio.pause();
+      enAudio.currentTime = 0;
+    };
+  }, [navigate]);
+
+  // Capture and classify
   const captureAndClassify = () => {
     if (!videoRef.current || !canvasRef.current) return;
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
 
+    // Swap width/height for -90° rotation
     canvas.width = video.videoHeight;
     canvas.height = video.videoWidth;
 
@@ -112,7 +111,8 @@ const ScanPage = () => {
 
     ctx.save();
     ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.rotate((-90 * Math.PI) / 180);
+    ctx.rotate((-90 * Math.PI) / 180); // -90° counter-clockwise to match preview
+    // Optional mirror: ctx.scale(-1, 1); // uncomment if USB camera is mirrored
     ctx.drawImage(video, -video.videoWidth / 2, -video.videoHeight / 2);
     ctx.restore();
 
@@ -123,8 +123,6 @@ const ScanPage = () => {
     }, "image/jpeg");
   };
 
-
-
   const customIcon = <LoadingOutlined style={{ fontSize: 200, color: "#F16323" }} spin />;
 
   return (
@@ -134,7 +132,7 @@ const ScanPage = () => {
     >
       {loadingCamera && (
         <Spin
-          indicator={customIcon} 
+          indicator={customIcon}
           tip="Connecting to camera..."
           className="absolute z-50"
           style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}
@@ -178,10 +176,11 @@ const ScanPage = () => {
       )}
 
       {!loadingCamera && (
-        <Button 
-          onClick={captureAndClassify} 
-          className="h-[120px] text-heading-xl absolute bottom-40 bg-[#AF6214] text-white px-6 py-3 rounded-lg z-40">
-            Scan
+        <Button
+          onClick={captureAndClassify}
+          className="h-[120px] text-heading-xl absolute bottom-40 bg-[#AF6214] text-white px-6 py-3 rounded-lg z-40"
+        >
+          Scan
         </Button>
       )}
     </Flex>
