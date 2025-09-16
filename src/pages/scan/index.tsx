@@ -156,11 +156,12 @@ const ScanPage = () => {
       <div className="absolute w-[720px] h-[720px] rounded-full overflow-hidden flex items-center justify-center z-30 border-[14px] border-[#AF6214]">
         <video 
           ref={videoRef} 
-          className="w-full h-full object-cover bg-white transform rotate-90" 
+          className="w-full h-full object-cover bg-white transform rotate-180" 
           autoPlay 
           muted 
         />
       </div>
+
 
       <canvas ref={canvasRef} className="hidden" />
 
