@@ -153,12 +153,12 @@ const ScanPage = () => {
       <img src={arrow_left} alt="left" className="absolute left-[calc(43%-600px)] top-1/2 transform -translate-y-1/2 w-[260px] h-[260px] z-20 cursor-pointer animate-leftToRight" />
       <img src={arrow_right} alt="right" className="absolute right-[calc(45%-600px)] top-1/2 transform -translate-y-1/2 w-[260px] h-[260px] z-20 cursor-pointer animate-rightToLeft" />
 
-      <div className="absolute w-[720px] h-[720px] rounded-full overflow-hidden flex items-center justify-center z-30 border-[14px] border-[#AF6214] transform rotate-90">
-        <video 
-          ref={videoRef} 
-          className="w-full h-full object-cover bg-white" 
-          autoPlay 
-          muted 
+      <div className="absolute w-[720px] h-[720px] rounded-full overflow-hidden flex items-center justify-center z-30 border-[14px] border-[#AF6214]">
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          className="video-rotated"
         />
       </div>
 
