@@ -68,7 +68,7 @@ const ScanPage = () => {
     };
   }, []);
 
-  // Auto-back timer
+
   useEffect(() => {
     const thAudio = thAudioRef.current;
     const enAudio = enAudioRef.current;
@@ -95,14 +95,12 @@ const ScanPage = () => {
     };
   }, [navigate]);
 
-  // Capture and classify
   const captureAndClassify = () => {
     if (!videoRef.current || !canvasRef.current) return;
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
 
-    // Swap width/height for -90° rotation
     canvas.width = video.videoHeight;
     canvas.height = video.videoWidth;
 
@@ -111,8 +109,7 @@ const ScanPage = () => {
 
     ctx.save();
     ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.rotate((-90 * Math.PI) / 180); // -90° counter-clockwise to match preview
-    // Optional mirror: ctx.scale(-1, 1); // uncomment if USB camera is mirrored
+    ctx.rotate((-90 * Math.PI) / 180);
     ctx.drawImage(video, -video.videoWidth / 2, -video.videoHeight / 2);
     ctx.restore();
 
@@ -181,9 +178,10 @@ const ScanPage = () => {
       {!loadingCamera && (
         <Button
           onClick={captureAndClassify}
-          className="h-[120px] text-heading-xl absolute bottom-40 bg-[#AF6214] text-white px-6 py-3 rounded-lg z-40"
-        >
-          Scan
+          type="default"
+          className="h-[120px] rounded-full animate-scalePulse text-text-brand text-heading-xl font-bold flex px-8 absolute bottom-40 z-40"
+          >
+             Scan
         </Button>
       )}  
     </Flex>

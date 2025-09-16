@@ -117,12 +117,12 @@ const PredictionPage = () => {
 
     const autoNavigateTimer = setTimeout(() => {
       if (results.length) {
-        const tankIndex = wasteIndexMap[results[0].type_th]; // default first item
+        const tankIndex = wasteIndexMap[results[0].type_th];
         console.log("⏱ Auto sending tankIndex:", tankIndex);
         setTankIndex(tankIndex);
         navigate("/correct", { state: { result: results } });
       }
-    }, 6000); 
+    }, 8000); 
 
     return () => clearTimeout(autoNavigateTimer);
   }, [showCheckCard]);

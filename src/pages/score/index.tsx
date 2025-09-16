@@ -53,7 +53,7 @@ const ScorePage = () => {
       if (autoSkipTimer.current) clearTimeout(autoSkipTimer.current);
       autoSkipTimer.current = setTimeout(() => {
         handleSkip();
-      }, 5000);
+      }, 20000);
     };
 
     resetTimer();

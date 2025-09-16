@@ -7,6 +7,7 @@ import WasteBinCard from "./component/WasteBinCard";
 import { wasteMap } from "../../types/wasteType"; 
 import { motion } from "framer-motion";
 import { useTank } from "../../context/TankContext";
+import { useEffect } from "react";
 
 const { Text } = Typography;
 
@@ -68,6 +69,14 @@ const OptionPage = () => {
       },
     });
   };
+
+   useEffect(() => {
+    const timer = setTimeout(() => {
+      navigate("/correct");
+    }, 10000); 
+
+    return () => clearTimeout(timer); 
+  }, [navigate]);
 
 
   return (

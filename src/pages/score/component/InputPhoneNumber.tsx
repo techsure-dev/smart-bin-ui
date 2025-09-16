@@ -57,7 +57,7 @@ const InputPhoneNumber = ({ inputValue, onKeyPress, onSkip, onSubmit }:InputPhon
               key ? (
                 <Button
                   key={i}
-                  type="dashed"
+                  type="default"
                   className="w-[100px] h-[100px] text-heading-xs font-bold rounded-full bg-white text-text-brand transition-all duration-300"
                   style={{ boxShadow: "0 8px 20px rgba(241, 99, 35, 0.2)" }}
                   onClick={() => onKeyPress(key)}
