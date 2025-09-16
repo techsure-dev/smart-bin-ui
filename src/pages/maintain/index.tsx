@@ -27,8 +27,8 @@ function maintain() {
   const [inputData, setInputData] = useState("");
   // const [tankValues, setTankValues] = useState([0, 0, 0, 0, 0]); // ✅ state สำหรับถัง 5 ถัง
   const messageBoxRef = useRef<HTMLDivElement>(null);
-  const { tankIndex, tankValues, setTankValues } = useTank();
-
+  const { tankIndex, tankValues, setTankValues, requestReadAll } = useTank();
+  
   const addMessage = (msg: string) => {
     const time = formatTimestamp(new Date());
     setMessages((prev) => [
