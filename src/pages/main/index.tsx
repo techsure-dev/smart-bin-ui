@@ -11,6 +11,7 @@ import techsureLogo from "../../assets/images/Logo/techsure_logo.png";
 import Header from "../../component/Header";
 import mianThSound from "../../assets/sound/0-มาช่วยกันแ.mp3";
 import mianEnSound from "../../assets/sound/3-Let'shelps.mp3";
+import { useTank } from "../../context/TankContext";
 
 
 const { Text } = Typography;
@@ -21,6 +22,10 @@ const MainPage = () => {
   const [defaultTouchedOnce, setDefaultTouchedOnce] = useState(false);
   const [isEnglish, setIsEnglish] = useState(false);
   const [fade, setFade] = useState(true);
+
+  
+  const { readDataAll, tankValues } = useTank();
+  const [usbMessages, setUsbMessages] = useState<string[]>([])
 
   const topRightClickCount = useRef(0);
   const topRightTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -40,6 +45,20 @@ const MainPage = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+ // ------------------- USB readDataAll and messages -------------------
+  useEffect(() => {
+  const fetchTankData = () => {
+    readDataAll(); // Trigger reading all tank data
+    console.log("Current tank values after sending points:", tankValues);
+  };
+
+  // Initial fetch
+  fetchTankData();
+
+  const interval = setInterval(fetchTankData, 60000);
+  return () => clearInterval(interval);
+}, [readDataAll, tankValues]);
 
   const startVideoTimeout = () => {
     if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
