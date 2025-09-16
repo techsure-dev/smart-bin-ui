@@ -157,7 +157,7 @@ const ScanPage = () => {
             ref={videoRef}
             className="w-full h-full object-cover bg-white"
             style={{
-              transform: "rotate(90deg) scaleX(-1)",
+              transform: "rotate(90deg)",
               transformOrigin: "center",
             }}
             autoPlay
