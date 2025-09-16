@@ -24,6 +24,7 @@ const SuccessScore = ({ countdown, skipped = false, phoneNumber }: SuccessScoreP
   const { totalPoints, listOfPoints , resetResults } = usePoints(); 
   const hasNavigatedRef = useRef(false);
   const { tankValues } = useTank();
+  const pendingResolveRef = useRef<((vals: number[]) => void) | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
@@ -43,22 +44,51 @@ const SuccessScore = ({ countdown, skipped = false, phoneNumber }: SuccessScoreP
     };
   }, []);
 
-  useEffect(() => {
-    if (skipped) return;
+useEffect(() => {
+  // resolve pending when tankValues change
+  if (pendingResolveRef.current) {
+    pendingResolveRef.current(tankValues);
+    pendingResolveRef.current = null;
+  }
+}, [tankValues]);
 
-    const sendPoints = async () => {
-      try {
-        const results = await collectScore(phoneNumber, listOfPoints);
-        console.log("✅ All points submitted successfully:", results);
-          console.log("Current tank values after sending points:", tankValues);
-      } catch (err) {
-        console.error("❌ Failed to submit points", err);
+async function requestFreshTankValues(timeoutMs = 3000): Promise<number[]> {
+  if (!window?.USB?.send) return tankValues;
+
+  window.USB.send("P 9 9\n");
+
+  return new Promise<number[]>((resolve) => {
+    pendingResolveRef.current = (vals) => resolve(vals);
+    setTimeout(() => {
+      if (pendingResolveRef.current) {
+        pendingResolveRef.current = null;
+        resolve(tankValues);
       }
-    };
+    }, timeoutMs);
+  });
+}
 
-    sendPoints();
-  }, [phoneNumber, skipped, listOfPoints, tankValues]);
+useEffect(() => {
+  if (skipped) return;
+  let cancelled = false;
 
+  const sendPoints = async () => {
+    try {
+      const fresh = await requestFreshTankValues();
+      if (cancelled) return;
+      console.log("fresh tanks:", fresh);
+      await collectScore(phoneNumber, listOfPoints);
+    } catch (err) {
+      if (!cancelled) console.error(err);
+    }
+  };
+
+  sendPoints();
+
+  return () => {
+    cancelled = true;
+  };
+}, [phoneNumber, skipped, listOfPoints]);
 
   useEffect(() => {
     if (countdown === 0 && !hasNavigatedRef.current) {

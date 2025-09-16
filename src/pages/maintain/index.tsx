@@ -41,6 +41,7 @@ function maintain() {
   useEffect(() => {
     window.onUsbMessage = (message: string) => {
       addMessage(message);
+      console.log("add Messge",message)
 
       // ลองดึงเลขทั้งหมดจากข้อความ
       const nums = message
