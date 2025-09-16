@@ -160,7 +160,7 @@ const openTank = (index: number) => {
 
   
   // ------------------- Render -------------------
-    const [isModalVisible, setIsModalVisible] = useState(true);
+  const [isModalVisible, setIsModalVisible] = useState(true);
   const [passwordInput, setPasswordInput] = useState("");
 
   const handlePasswordSubmit = () => {
@@ -170,6 +170,12 @@ const openTank = (index: number) => {
       setPasswordInput("");
     }
   };
+
+  const handleBack = () => {
+      navigate("/"); 
+    };
+
+    
   if (isModalVisible) {
     return (
       <Modal
@@ -178,6 +184,9 @@ const openTank = (index: number) => {
         closable={false}
         centered 
         footer={[
+          <Button key="back" onClick={handleBack}>
+          Back
+        </Button>,
           <Button key="submit" type="primary" onClick={handlePasswordSubmit}>
             Submit
           </Button>,
@@ -288,7 +297,7 @@ const openTank = (index: number) => {
             width: 50,
             height: 50,
             cursor: "pointer",
-            // backgroundColor: "rgba(0,0,255,0.2)" 
+            backgroundColor: "rgba(0,0,255,0.2)" 
           }}
         />
     </div>
