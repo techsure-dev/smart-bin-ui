@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Flex } from "antd";
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "../../component/Header";
@@ -6,14 +6,14 @@ import InputPhoneNumber from "./component/InputPhoneNumber";
 import SuccessScore from "./component/SuccessScore";
 import { usePoints } from "../../context/PointsContext";
 
-
 const ScorePage = () => {
   const [inputValue, setInputValue] = useState<string>("");
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [skipped, setSkipped] = useState<boolean>(false);
-  const [countdown, setCountdown] = useState<number>(10);
+  const [countdown, setCountdown] = useState<number>(5);
   const { totalPoints, resetResults } = usePoints();
 
+  const autoSkipTimer = useRef<NodeJS.Timeout | null>(null);
 
   const handleKeyPress = (key: string) => {
     if (key === "x") {
@@ -25,26 +25,51 @@ const ScorePage = () => {
 
   const handleSubmit = () => {
     if (inputValue.length === 0) return;
-    setSkipped(false); 
+    setSkipped(false);
     setSubmitted(true);
   };
 
   const handleSkip = () => {
     setInputValue("");
-    setSkipped(true); 
+    setSkipped(true);
     setSubmitted(true);
   };
 
-    useEffect(() => {
-      if (!submitted) return;
 
-      const timer = setInterval(() => {
-        setCountdown((prev) => prev - 1);
-      }, 1000);
+  useEffect(() => {
+    if (!submitted) return;
 
-      return () => clearInterval(timer);
-    }, [submitted]);
+    const timer = setInterval(() => {
+      setCountdown((prev) => prev - 1);
+    }, 1000);
 
+    return () => clearInterval(timer);
+  }, [submitted]);
+
+  useEffect(() => {
+    if (submitted) return; 
+
+    const resetTimer = () => {
+      if (autoSkipTimer.current) clearTimeout(autoSkipTimer.current);
+      autoSkipTimer.current = setTimeout(() => {
+        handleSkip();
+      }, 5000);
+    };
+
+    resetTimer();
+    const handleUserInput = () => {
+      resetTimer();
+    };
+
+    document.addEventListener("keydown", handleUserInput);
+    document.addEventListener("mousedown", handleUserInput);
+
+    return () => {
+      if (autoSkipTimer.current) clearTimeout(autoSkipTimer.current);
+      document.removeEventListener("keydown", handleUserInput);
+      document.removeEventListener("mousedown", handleUserInput);
+    };
+  }, [submitted]);
 
   return (
     <Flex className="absolute w-full h-screen bg-white flex flex-col items-center justify-start transition-opacity duration-500 z-10">
@@ -52,7 +77,6 @@ const ScorePage = () => {
         <Header />
       </Flex>
 
-  
       <AnimatePresence mode="wait">
         {!submitted ? (
           <motion.div
@@ -76,11 +100,11 @@ const ScorePage = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
-            <SuccessScore 
-              countdown={countdown} 
-              skipped={skipped} 
-              totalPoints={totalPoints} 
-              resetResults={resetResults} 
+            <SuccessScore
+              countdown={countdown}
+              skipped={skipped}
+              totalPoints={totalPoints}
+              resetResults={resetResults}
               phoneNumber={inputValue}
             />
           </motion.div>

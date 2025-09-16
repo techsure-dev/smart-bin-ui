@@ -16,7 +16,7 @@ const CorrectPage = () => {
   const [reverse, setReverse] = useState<boolean>(false);
   const [showText, setShowText] = useState<boolean>(false);
 
-  const { addResults, results } = usePoints();
+  const { addResults } = usePoints();
 
   const addedRef = useRef(false);
 
@@ -53,6 +53,16 @@ const CorrectPage = () => {
     const textTimer = setTimeout(() => setShowText(true), 3200);
     return () => clearTimeout(textTimer);
   }, [showCheck]);
+
+  useEffect(() => {
+    if (!showText) return;
+
+    const autoTimer = setTimeout(() => {
+      navigate("/score");
+    }, 5000); 
+
+    return () => clearTimeout(autoTimer); 
+  }, [showText, navigate]);
 
   return (
     <Flex className="w-screen h-screen items-center justify-center relative bg-white overflow-hidden">

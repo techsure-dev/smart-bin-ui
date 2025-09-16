@@ -68,6 +68,35 @@ const ScanPage = () => {
     };
   }, []);
 
+  useEffect(() => {
+  const thAudio = thAudioRef.current;
+  const enAudio = enAudioRef.current;
+  if (!thAudio || !enAudio) return;
+
+  let autoBackTimer: NodeJS.Timeout;
+
+  const startAutoBackTimer = () => {
+    autoBackTimer = setTimeout(() => {
+      navigate("/"); 
+    }, 5000);
+  };
+  thAudio.play().catch(err => console.log("Audio play error:", err));
+  thAudio.onended = () => {
+    enAudio.play().catch(err => console.log("Audio play error:", err));
+    enAudio.onended = () => {
+      startAutoBackTimer(); 
+    };
+  };
+  return () => {
+    clearTimeout(autoBackTimer);
+    thAudio.pause();
+    thAudio.currentTime = 0;
+    enAudio.pause();
+    enAudio.currentTime = 0;
+  };
+}, [navigate]);
+
+
   const captureAndClassify = () => {
     thAudioRef.current?.pause();
     thAudioRef.current!.currentTime = 0;
@@ -125,7 +154,12 @@ const ScanPage = () => {
       <img src={arrow_right} alt="right" className="absolute right-[calc(45%-600px)] top-1/2 transform -translate-y-1/2 w-[260px] h-[260px] z-20 cursor-pointer animate-rightToLeft" />
 
       <div className="absolute w-[720px] h-[720px] rounded-full overflow-hidden flex items-center justify-center z-30 border-[14px] border-[#AF6214]">
-        <video ref={videoRef} className="w-full h-full object-cover bg-white" autoPlay muted />
+        <video 
+          ref={videoRef} 
+          className="w-full h-full object-cover bg-white transform rotate-90" 
+          autoPlay 
+          muted 
+        />
       </div>
 
       <canvas ref={canvasRef} className="hidden" />

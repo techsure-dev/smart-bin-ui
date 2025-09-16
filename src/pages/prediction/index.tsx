@@ -35,7 +35,7 @@ const PredictionPage = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { setTankIndex } = useTank();
 
-  // Toggle language every 5 seconds
+
   useEffect(() => {
     const showCheckTimer = setTimeout(() => setShowCheckCard(true), 1500);
     return () => {
@@ -111,6 +111,21 @@ const PredictionPage = () => {
 
     playNext();
   }, [results]);
+
+  useEffect(() => {
+    if (!showCheckCard) return;
+
+    const autoNavigateTimer = setTimeout(() => {
+      if (results.length) {
+        const tankIndex = wasteIndexMap[results[0].type_th]; // default first item
+        console.log("⏱ Auto sending tankIndex:", tankIndex);
+        setTankIndex(tankIndex);
+        navigate("/correct", { state: { result: results } });
+      }
+    }, 6000); 
+
+    return () => clearTimeout(autoNavigateTimer);
+  }, [showCheckCard]);
 
 
   if (!results.length) {

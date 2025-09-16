@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
 import CategoryCard from "./component/CategoryCard";
-import { Button, Flex, Typography } from "antd";
+import { Button, Flex, Spin, Typography } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 import { wasteMap } from "../../types/wasteType";
 import VideoPr from "../../assets/video/smart_bit_pr.mp4";
 import kCleanLogo from "../../assets/images/Logo/K-CLEAN-LOGO.png";
@@ -25,7 +26,6 @@ const MainPage = () => {
 
   
   const { readDataAll, tankValues } = useTank();
-  const [usbMessages, setUsbMessages] = useState<string[]>([])
 
   const topRightClickCount = useRef(0);
   const topRightTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -33,6 +33,10 @@ const MainPage = () => {
   const overlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioFiles = [mianThSound, mianEnSound];
+
+  const [videoLoading, setVideoLoading] = useState(true); 
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -49,11 +53,10 @@ const MainPage = () => {
  // ------------------- USB readDataAll and messages -------------------
   useEffect(() => {
   const fetchTankData = () => {
-    readDataAll(); // Trigger reading all tank data
+    readDataAll(); 
     console.log("Current tank values after sending points:", tankValues);
   };
 
-  // Initial fetch
   fetchTankData();
 
   const interval = setInterval(fetchTankData, 60000);
@@ -64,7 +67,7 @@ const MainPage = () => {
     if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
     overlayTimeoutRef.current = setTimeout(() => {
       setShowVideoOverlay(true);
-    }, 20000);
+    }, 10000);
   };
 
   const handleOverlayClick = () => {
@@ -118,6 +121,8 @@ const MainPage = () => {
       }, 1000); 
     }
   };
+
+ const customIcon = <LoadingOutlined style={{ fontSize: 200, color: "#F16323" }} spin />;
 
   return (
     <Flex className="w-full h-full flex-col items-center justify-center relative">
@@ -201,12 +206,24 @@ const MainPage = () => {
           onClick={handleOverlayClick}
           onTouchStart={handleOverlayClick}
         >
-          <video
+          {videoLoading && (
+             <Spin
+              indicator={customIcon} 
+              tip="Connecting to camera..."
+              className="absolute z-50"
+              style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}
+            />
+          )}
+            <video
+            ref={videoRef}
             src={VideoPr}
             autoPlay
             loop
             playsInline
-            className="absolute w-full h-full object-cover object-center"
+            className={`absolute w-full h-full object-cover object-center ${
+              videoLoading ? "opacity-0" : "opacity-100 transition-opacity duration-500"
+            }`}
+            onCanPlay={() => setVideoLoading(false)} 
           />
           <Flex
             vertical
