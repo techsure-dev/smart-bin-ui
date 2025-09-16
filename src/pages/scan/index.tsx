@@ -76,6 +76,7 @@ const ScanPage = () => {
   let autoBackTimer: NodeJS.Timeout;
 
   const startAutoBackTimer = () => {
+
     autoBackTimer = setTimeout(() => {
       navigate("/"); 
     }, 5000);
@@ -98,31 +99,31 @@ const ScanPage = () => {
 
 
   const captureAndClassify = () => {
-    thAudioRef.current?.pause();
-    thAudioRef.current!.currentTime = 0;
-    enAudioRef.current?.pause();
-    enAudioRef.current!.currentTime = 0;
-
     if (!videoRef.current || !canvasRef.current) return;
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    canvas.width = video.videoHeight;
+    canvas.height = video.videoWidth;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate((-90 * Math.PI) / 180);
+    ctx.drawImage(video, -video.videoWidth / 2, -video.videoHeight / 2);
+    ctx.restore();
 
     canvas.toBlob((blob) => {
       if (!blob) return;
       const file = new File([blob], "capture.jpg", { type: "image/jpeg" });
-
       navigate("/loading", { state: { file } });
     }, "image/jpeg");
   };
+
+
 
   const customIcon = <LoadingOutlined style={{ fontSize: 200, color: "#F16323" }} spin />;
 
@@ -154,11 +155,12 @@ const ScanPage = () => {
       <img src={arrow_right} alt="right" className="absolute right-[calc(45%-600px)] top-1/2 transform -translate-y-1/2 w-[260px] h-[260px] z-20 cursor-pointer animate-rightToLeft" />
 
       <div className="absolute w-[720px] h-[720px] rounded-full overflow-hidden flex items-center justify-center z-30 border-[14px] border-[#AF6214]">
-        <video 
-          ref={videoRef} 
-          className="w-full h-full object-cover bg-white transform rotate-90" 
-          autoPlay 
-          muted 
+        <video
+          ref={videoRef}
+          className="w-full h-full object-cover bg-white transform -rotate-90"
+          style={{ transformOrigin: "center" }}
+          autoPlay
+          muted
         />
       </div>
 
