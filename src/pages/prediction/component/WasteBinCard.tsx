@@ -20,13 +20,12 @@ const WasteBinCard = ({
 }:WasteBinCardProps) => {
   return (
       <Flex vertical className="items-center justify-between relative">
-      {/* Image */}
       <img
         src={binImage}
         alt={type}
         className="w-[300px] h-[460px] object-contain relative z-10"
         style={{
-          marginBottom: "-30px", 
+          marginBottom: "-40px", 
         }}
       />
 
@@ -38,7 +37,7 @@ const WasteBinCard = ({
         }}
       >
         <Text
-          className="text-heading-m font-bold mt-20" 
+          className="text-heading-m font-bold mt-12" 
           style={{ color: textColor }}
         >
           {type}

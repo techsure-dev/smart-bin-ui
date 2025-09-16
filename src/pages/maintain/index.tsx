@@ -1,7 +1,7 @@
-
 import { Button, Input, Modal } from "antd";
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTank } from "../../context/TankContext";
 
 function escapeHtml(unsafe: string) {
   return unsafe
@@ -25,8 +25,9 @@ function maintain() {
     "<i>Messages from native code will appear here...</i>",
   ]);
   const [inputData, setInputData] = useState("");
-  const [tankValues, setTankValues] = useState([0, 0, 0, 0, 0]); // ✅ state สำหรับถัง 5 ถัง
+  // const [tankValues, setTankValues] = useState([0, 0, 0, 0, 0]); // ✅ state สำหรับถัง 5 ถัง
   const messageBoxRef = useRef<HTMLDivElement>(null);
+  const { tankIndex, tankValues, setTankValues } = useTank();
 
   const addMessage = (msg: string) => {
     const time = formatTimestamp(new Date());
@@ -92,14 +93,24 @@ function maintain() {
   };
 
   // ------------------- Tank Control -------------------
-  const openTank = (index: number) => {
-    if (window.USB?.send) {
-      window.USB.send(`F ${index} 5000\n`);
-      addMessage(`ส่งคำสั่งเปิดถัง 'F ${index} 5000' → USB`);
-    } else {
-      addMessage("Error: USB bridge not available in JS for sending.");
+  useEffect(() => {
+    if (tankIndex !== null) {
+      openTank(tankIndex);   
     }
-  };
+  }, [tankIndex]);
+  
+const openTank = (index: number) => {
+  if (window.USB?.send) {
+    console.log("👉 tankIndex from context:", index); 
+
+    window.USB.send(`F ${index} 5000\n`);
+    addMessage(`ส่งคำสั่งเปิดถัง 'F ${index} 5000' → USB`);
+  } else {
+    addMessage("Error: USB bridge not available in JS for sending.");
+  }
+};
+
+
 
   // ✅ อ่านค่าทุกถัง
   const readDataAll = () => {

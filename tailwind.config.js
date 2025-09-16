@@ -109,12 +109,28 @@ export default {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-50px)" }, 
         },
+         fadeIn: {
+          "0%": { opacity: 0 },
+          "100%": { opacity: 1 },
+        },
+        fadeOut: {
+          "0%": { opacity: 1 },
+          "100%": { opacity: 0 },
+        },
       },
       animation: {
         scalePulse: "scalePulse 1.5s ease-in-out infinite",
         leftToRight: "leftToRight 2s ease-in-out infinite",
         rightToLeft: "rightToLeft 2s ease-in-out infinite",
         floatUpDown: "floatUpDown 2s ease-in-out infinite",
+        fadeIn: "fadeIn 0.3s ease-in forwards",
+        fadeOut: "fadeOut 0.3s ease-out forwards",
+       },
+      transitionProperty: {
+        opacity: "opacity",
+      },
+      transitionDuration: {
+        300: "300ms",
       },
     },
   },

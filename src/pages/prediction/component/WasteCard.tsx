@@ -1,13 +1,9 @@
 import { Flex, Typography } from "antd";
-import { useEffect, useState } from "react";
-
 const { Text } = Typography;
 
 interface WasteCardProps {
   item_th: string;
   item_en: string;
-  type_th: string;
-  type_en: string;
   image: string;
   bgColor: string;
   textColor: string;
@@ -17,23 +13,10 @@ interface WasteCardProps {
 const WasteCard = ({
   item_th,
   item_en,
-  type_th,
-  type_en,
   image,
   bgColor,
   textColor,
 }: WasteCardProps) => {
-  const [showThai, setShowThai] = useState(true);
-
-  // Switch language every 5s
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setShowThai((prev) => !prev);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <Flex
       className="w-[500px] min-h-[620px] flex flex-col items-center justify-between rounded-2xl p-8"
@@ -48,25 +31,12 @@ const WasteCard = ({
         </Text>
 
         <Flex vertical className="gap-2 transition-opacity duration-500 ease-in-out">
-          {showThai ? (
-            <>
-              <Text className="text-heading-s font-bold" style={{ color: textColor }}>
-                {item_th}
-              </Text>
-              <Text className="text-label-m" style={{ color: textColor }}>
-                {type_th}
-              </Text>
-            </>
-          ) : (
-            <>
-              <Text className="text-heading-s font-bold" style={{ color: textColor }}>
-                {item_en}
-              </Text>
-              <Text className="text-label-m" style={{ color: textColor }}>
-                {type_en}
-              </Text>
-            </>
-          )}
+          <Text className="text-heading-s font-bold h-[140px]" style={{ color: textColor }}>
+            {item_th}
+          </Text>
+          <Text className="text-label-m" style={{ color: textColor }}>
+            {item_en}
+          </Text>
         </Flex>
       </Flex>
 

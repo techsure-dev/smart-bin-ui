@@ -10,8 +10,17 @@ import CheckCard from "./component/CheckCard";
 import { motion } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { textToSpeech } from "../../api/audioWaste";
+import { useTank } from "../../context/TankContext";
 
 const { Text } = Typography;
+
+const wasteIndexMap: Record<string, number> = {
+  "ขยะกำพร้า": 0,
+  "ขยะทั่วไป": 1,
+  "ขวดพลาสติก": 2,
+  "ขวดแก้ว กระป๋อง โลหะ อะลูมิเนียม": 3,
+  "ขยะอันตราย": 4,
+};
 
 const PredictionPage = () => {
   const location = useLocation();
@@ -23,81 +32,86 @@ const PredictionPage = () => {
   const results = state?.result || [];
 
   const [showCheckCard, setShowCheckCard] = useState(false);
-  const [isEnglish, setIsEnglish] = useState(false);
-  const [audioCache, setAudioCache] = useState<Record<string, { th: string; en: string }>>({});
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { setTankIndex } = useTank();
 
+  // Toggle language every 5 seconds
   useEffect(() => {
-    const langInterval = setInterval(() => setIsEnglish(prev => !prev), 5000);
-
     const showCheckTimer = setTimeout(() => setShowCheckCard(true), 1500);
-
-    const preloadAudio = async () => {
-      if (!results.length) return;
-      const cache: Record<string, { th: string; en: string }> = {};
-      for (const wasteItem of results) {
-        try {
-          const thBlob = await textToSpeech(`${wasteItem.item_th} ${wasteItem.type_th}`);
-          const enBlob = await textToSpeech(`${wasteItem.item_en} ${wasteItem.type_en}`);
-          cache[wasteItem.item_th] = {
-            th: URL.createObjectURL(thBlob),
-            en: URL.createObjectURL(enBlob),
-          };
-        } catch (err) {
-          console.error("TTS preload error:", err);
-        }
-      }
-      setAudioCache(cache);
-    };
-
-    preloadAudio();
-
     return () => {
-      clearInterval(langInterval);
       clearTimeout(showCheckTimer);
     };
-  }, [results]);
+  }, []);
+
 
   useEffect(() => {
-    if (!results.length || Object.keys(audioCache).length === 0 || !audioRef.current) return;
+    if (!results.length) return;
+
+    const audio = audioRef.current;
+    if (!audio) return;
 
     let index = 0;
+    let isCancelled = false;
+
+    const playAudio = (src: Blob | string, rate = 1) => {
+      return new Promise<void>(async (resolve, reject) => {
+        if (!audio || isCancelled) return reject("Audio ref is null or cancelled");
+        audio.src = src instanceof Blob ? URL.createObjectURL(src) : src;
+        const onCanPlay = () => {
+          if (isCancelled) return resolve();
+          audio.playbackRate = rate;
+          audio.play().catch(reject);
+        };
+
+        const onEnded = () => {
+          audio.removeEventListener("ended", onEnded);
+          audio.removeEventListener("canplay", onCanPlay);
+          resolve();
+        };
+
+        audio.addEventListener("canplay", onCanPlay);
+        audio.addEventListener("ended", onEnded);
+      });
+    };
 
     const playNext = async () => {
-      if (index >= results.length) return;
+      if (index >= results.length || isCancelled) return;
 
       const wasteItem = results[index];
-      const audioTh = audioCache[wasteItem.item_th]?.th;
-      const audioEn = audioCache[wasteItem.item_th]?.en;
+      const waste = wasteMap[wasteItem.type_th];
 
-      if (!audioTh || !audioEn) {
+      try {
+        // 1️⃣ TTS Thai
+        const thBlob = await textToSpeech(`${wasteItem.item_th}`);
+        await playAudio(thBlob, 1.5);
+
+        // 2️⃣ TTS English
+        const enBlob = await textToSpeech(`${wasteItem.item_en}`);
+        await playAudio(enBlob, 1.5);
+
+        // 3️⃣ Waste type audio Thai
+        if (waste?.soundTh) {
+          const thWasteBlob = await fetch(waste.soundTh).then(res => res.blob());
+          await playAudio(thWasteBlob);
+        }
+        // 4️⃣ Waste type audio English
+        if (waste?.soundEn) {
+          const enWasteBlob = await fetch(waste.soundEn).then(res => res.blob());
+          await playAudio(enWasteBlob);
+        }
+
         index++;
         playNext();
-        return;
+      } catch (err) {
+        console.error("Audio playback error:", err);
+        index++;
+        playNext();
       }
-
-      if (!audioRef.current) return;
-
-      // Play Thai audio
-      audioRef.current.src = audioTh;
-      await audioRef.current.play().catch(() => {});
-
-      audioRef.current.onended = async () => {
-        if (!audioRef.current) return;
-
-        // Play English audio
-        audioRef.current.src = audioEn;
-        await audioRef.current.play().catch(() => {});
-
-        audioRef.current.onended = () => {
-          index++;
-          playNext();
-        };
-      };
     };
 
     playNext();
-  }, [audioCache, results]);
+  }, [results]);
+
 
   if (!results.length) {
     return (
@@ -129,15 +143,13 @@ const PredictionPage = () => {
                 <WasteCard
                   item_th={wasteItem.item_th}
                   item_en={wasteItem.item_en}
-                  type_th={wasteItem.type_th}
-                  type_en={wasteItem.type_en}
                   image={waste.image}
                   bgColor={waste.bgColor}
                   textColor={waste.textColor}
                 />
               </div>
 
-              <div className="mt-20">
+              <div className="mt-14">
                 <ArrowIcon className="h-[220px] w-[130px] animate-bounce" fill={waste.bgColor} />
               </div>
 
@@ -159,8 +171,13 @@ const PredictionPage = () => {
                   transition={{ duration: 0.8, ease: "easeOut" }}
                   className="absolute top-[41%] left-[4%] -translate-y-1/2 z-40"
                 >
-                  <CheckCard
-                    onCorrect={() => navigate("/correct")}
+                 <CheckCard
+                    onCorrect={() => {
+                      const tankIndex = wasteIndexMap[wasteItem.type_th];
+                      console.log("👉 Sending tankIndex:", tankIndex); 
+                      setTankIndex(tankIndex); 
+                      navigate("/correct",{ state: { result: results } });
+                    }}
                     onWrong={() => navigate("/option", { state: { result: results } })}
                   />
                 </motion.div>

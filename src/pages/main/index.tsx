@@ -2,14 +2,16 @@ import { useNavigate } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
 import CategoryCard from "./component/CategoryCard";
 import { Button, Flex, Typography } from "antd";
-import Header from "../../component/Header";
 import { wasteMap } from "../../types/wasteType";
 import VideoPr from "../../assets/video/smart_bit_pr.mp4";
 import kCleanLogo from "../../assets/images/Logo/K-CLEAN-LOGO.png";
 import pmoLogo from "../../assets/images/Logo/pmo_logo.png";
 import buildKmitlLogo from "../../assets/images/Logo/BUILD_KMITL-LOGO.png";
 import techsureLogo from "../../assets/images/Logo/techsure_logo.png";
-import { textToSpeech } from "../../api/audioWaste";
+import Header from "../../component/Header";
+import mianThSound from "../../assets/sound/0-มาช่วยกันแ.mp3";
+import mianEnSound from "../../assets/sound/3-Let'shelps.mp3";
+
 
 const { Text } = Typography;
 
@@ -18,83 +20,72 @@ const MainPage = () => {
   const [showVideoOverlay, setShowVideoOverlay] = useState(true);
   const [defaultTouchedOnce, setDefaultTouchedOnce] = useState(false);
   const [isEnglish, setIsEnglish] = useState(false);
-  const overlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audioCache = useRef<{ th?: string; en?: string }>({});
+  const [fade, setFade] = useState(true);
+
   const topRightClickCount = useRef(0);
   const topRightTimeout = useRef<NodeJS.Timeout | null>(null);
 
-console.log(VideoPr);
+  const overlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioFiles = [mianThSound, mianEnSound];
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setIsEnglish((prev) => !prev);
+      setFade(false);
+      setTimeout(() => {
+        setIsEnglish(prev => !prev);
+        setFade(true); 
+      }, 300); 
     }, 5000);
-    return () => clearInterval(interval);
-  }, []);
 
-  useEffect(() => {
-    const preloadAudio = async () => {
-      try {
-        const thBlob = await textToSpeech("มาช่วยกันเเยกขยะกันเถอะ");
-        const enBlob = await textToSpeech("Let's help separate the trash.");
-        audioCache.current = {
-          th: URL.createObjectURL(thBlob),
-          en: URL.createObjectURL(enBlob),
-        };
-      } catch (err) {
-        console.error("TTS preload error:", err);
-      }
-    };
-    preloadAudio();
+    return () => clearInterval(interval);
   }, []);
 
   const startVideoTimeout = () => {
     if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
     overlayTimeoutRef.current = setTimeout(() => {
       setShowVideoOverlay(true);
-      setDefaultTouchedOnce(false);
-      if (audioRef.current) {
-        audioRef.current.pause(); 
-      }
-    }, 20000); 
-  };
-
- 
-  const playTTSSequence = async () => {
-    if (!audioRef.current || !audioCache.current) return;
-    audioRef.current.src = audioCache.current.th!;
-    audioRef.current.currentTime = 0;
-    await audioRef.current.play().catch(() => {});
-
-    audioRef.current.onended = async () => {
-      audioRef.current!.src = audioCache.current.en!;
-      audioRef.current!.currentTime = 0;
-      await audioRef.current!.play().catch(() => {});
-      audioRef.current!.onended = null;
-    };
+    }, 20000);
   };
 
   const handleOverlayClick = () => {
     setShowVideoOverlay(false);
     setDefaultTouchedOnce(false);
     startVideoTimeout();
-    playTTSSequence();
+    if (audioRef.current) {
+      audioRef.current.play().catch(() => {});
+    }
   };
 
   const handleDefaultClick = () => {
     if (!defaultTouchedOnce) {
       setDefaultTouchedOnce(true);
       startVideoTimeout();
-      playTTSSequence();
+
+      if (audioRef.current) {
+        let index = 0;
+
+        const playNext = () => {
+          if (index < audioFiles.length) {
+            audioRef.current!.src = audioFiles[index];
+            audioRef.current!.currentTime = 0;
+            audioRef.current!.play().catch(() => {});
+            index += 1;
+            audioRef.current!.onended = playNext;
+          } else {
+            audioRef.current!.onended = null;
+          }
+        };
+
+        playNext();
+      }
     } else {
       if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
-      if (audioRef.current) audioRef.current.pause();
       navigate("/scan");
     }
   };
 
-  const handleTopRightClick = () => {
+   const handleTopRightClick = () => {
     topRightClickCount.current += 1;
 
     if (topRightClickCount.current === 3) {
@@ -109,11 +100,10 @@ console.log(VideoPr);
     }
   };
 
-
   return (
-    <Flex className="w-full h-screen relative flex flex-col items-center justify-start">
-      <Flex className="w-full sticky top-0 z-0 bg-white">
-        <Header />
+    <Flex className="w-full h-full flex-col items-center justify-center relative">
+      <Flex className="w-full sticky top-0 z-20 bg-white">
+            <Header />
       </Flex>
 
       <Flex
@@ -121,31 +111,36 @@ console.log(VideoPr);
         onClick={handleDefaultClick}
         onTouchStart={handleDefaultClick}
       >
-        <Flex vertical className="gap-[140px] item-center justify-center mt-24">
-          <Flex vertical className="items-center">
-            {isEnglish ? (
-              <>
-                <Text className="font-bold text-hero">Confused?</Text>
-                <Text className="font-bold text-hero">
-                  LET ME HELP <span className="text-text-brand">SORT</span> เอง
-                </Text>
-              </>
-            ) : (
-              <>
-                <Text className="font-bold text-hero">มาแยกขยะกันไหม?</Text>
-                <Text className="font-bold text-hero">
-                  เดี๋ยวเราช่วย <span className="text-text-brand">แยก</span> เอง
-                </Text>
-              </>
-            )}
+        
+        <Flex vertical className="gap-[140px] items-center justify-center">
+          <Flex vertical className="items-center relative ">
+            <Text
+              className={`text-hero font-bold transition-opacity duration-300 ${
+                fade ? "animate-fadeIn" : "animate-fadeOut"
+              }`}
+            >
+              {isEnglish ? "Confused?" : "มาแยกขยะกันไหม?"}
+            </Text>
+            <Text
+              className={`text-hero font-bold transition-opacity duration-300 mt-6 ${
+                fade ? "animate-fadeIn" : "animate-fadeOut"
+              }`}
+            >
+              {isEnglish ? (
+                <>LET ME HELP <span className="text-text-brand">SORT</span></>
+              ) : (
+                <>เดี๋ยวเราช่วย <span className="text-text-brand">แยก</span></>
+              )}
+            </Text>
           </Flex>
 
-          <Flex className="grid grid-cols-5 divide-x-2 divide-gray-300">
+          <Flex className="grid grid-cols-5 divide-x-2 divide-gray-300 mt-6">
             {Object.entries(wasteMap).map(([key, waste]) => (
               <CategoryCard
                 key={key}
                 image={waste.image}
                 header={isEnglish ? waste.description : key}
+                 fade={fade}
                 bgColor={waste.bgColor}
                 iconColor={waste.iconColor || waste.bgColor}
                 textColor={waste.textColor}
@@ -158,13 +153,20 @@ console.log(VideoPr);
               type="primary"
               className="w-fit h-[120px] rounded-full animate-scalePulse bg-background-brand text-white text-heading-m font-bold flex px-8"
             >
-              {isEnglish ? "Tap to start" : "แตะหน้าจอเพื่อเริ่มแยกขยะ"}
+              <span className={`${fade ? "animate-fadeIn" : "animate-fadeOut"} flex`}>
+                {isEnglish ? "Tap to start" : "แตะหน้าจอเพื่อเริ่มแยกขยะ"}
+              </span>
             </Button>
           </Flex>
         </Flex>
 
+  
         <Flex vertical className="items-center mt-72">
-          <Text className="text-heading-s">ร่วมพัฒนาโดย</Text>
+          <Text
+            className={`text-heading-s ${fade ? "animate-fadeIn" : "animate-fadeOut"}`}
+          >
+            {isEnglish ? "Developed by" : "ร่วมพัฒนาโดย"}
+          </Text>
           <Flex className="items-center justify-center gap-10">
             <img src={kCleanLogo} alt="Logo" className="h-[80px] cursor-pointer" />
             <img src={pmoLogo} alt="Logo" className="h-[80px] cursor-pointer" />
@@ -187,16 +189,17 @@ console.log(VideoPr);
             playsInline
             className="absolute w-full h-full object-cover object-center"
           />
-
           <Flex
             vertical
             className="absolute bottom-0 w-full h-[300px] items-center justify-end pb-20 z-10"
           >
             <Button
               type="primary"
-              className="w-fit h-[120px] rounded-full animate-scalePulse bg-background-brand text-white text-heading-m font-bold flex px-8 z-20"
+              className="w-fit h-[120px] rounded-full animate-scalePulse bg-background-brand text-white text-heading-m font-bold flex px-8"
             >
-              {isEnglish ? "Tap to start" : "แตะหน้าจอเพื่อเริ่มแยกขยะ"}
+              <span className={`${fade ? "animate-fadeIn" : "animate-fadeOut"} flex`}>
+                {isEnglish ? "Tap to start" : "แตะหน้าจอเพื่อเริ่มแยกขยะ"}
+              </span>
             </Button>
           </Flex>
         </Flex>
@@ -212,11 +215,11 @@ console.log(VideoPr);
           right: 0,
           width: 50,
           height: 50,
+          zIndex: 50,
           cursor: "pointer",
-          // backgroundColor: "rgba(255,0,0,0.2)" 
+          // backgroundColor: "rgba(255,0,0,0.2)",
         }}
       />
-
     </Flex>
   );
 };

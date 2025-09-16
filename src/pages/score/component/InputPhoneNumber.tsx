@@ -4,14 +4,14 @@ import inputScoreImage from "../../../assets/images/input_score.png";
 
 const { Text } = Typography;
 
-interface InputScoreProps {
+interface InputPhoneNumberProps {
   inputValue: string;
   onKeyPress: (key: string) => void;
   onSkip: () => void;
   onSubmit: () => void;
 }
 
-const InputScore = ({ inputValue, onKeyPress, onSkip, onSubmit }:InputScoreProps) => {
+const InputPhoneNumber = ({ inputValue, onKeyPress, onSkip, onSubmit }:InputPhoneNumberProps) => {
   return (
     <Flex className="flex flex-col items-center">
       {/* Image */}
@@ -27,11 +27,10 @@ const InputScore = ({ inputValue, onKeyPress, onSkip, onSubmit }:InputScoreProps
           ขอบคุณที่รักษ์โลก
         </Text>
         <Text className="font-bold text-heading-s">
-          กรอกเบอร์โทรศัพท์เพื่อรับ{" "}
-          <span className="text-text-brand">+1 คะแนน</span> เลย!
+          กรอกเบอร์โทรศัพท์เพื่อรับคะแนนเลย!
         </Text>
         <Text className="font-bold text-heading-xs text-text-subtitle">
-          Enter your phone number to get +65 greenpoints!
+          Enter your phone number to get greenpoints!
         </Text>
       </Flex>
 
@@ -102,4 +101,4 @@ const InputScore = ({ inputValue, onKeyPress, onSkip, onSubmit }:InputScoreProps
   );
 };
 
-export default InputScore;
+export default InputPhoneNumber;

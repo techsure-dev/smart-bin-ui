@@ -7,6 +7,8 @@ import bg from "../../assets/images/bg.png";
 import dot from "../../assets/images/Dot.png";
 import arrow_left from "../../assets/images/arrow_left.png";
 import arrow_right from "../../assets/images/arrow_right.png";
+import scanThSound from "../../assets/sound/2-วางขยะให้อ.mp3"
+import scanEnSound from "../../assets/sound/5-Keepthetra.mp3"
 
 const { Text } = Typography;
 
@@ -17,6 +19,9 @@ const ScanPage = () => {
   const location = useLocation(); 
   const [errorMessage, setErrorMessage] = useState<string>();
   const [loadingCamera, setLoadingCamera] = useState(true); 
+  const thAudioRef = useRef<HTMLAudioElement | null>(null);
+  const enAudioRef = useRef<HTMLAudioElement | null>(null);
+
 
   useEffect(() => {
     if (devices.length > 0) {
@@ -46,7 +51,29 @@ const ScanPage = () => {
     }
   }, [location.state]);
 
+  useEffect(() => {
+    thAudioRef.current = new Audio(scanThSound);
+    enAudioRef.current = new Audio(scanEnSound);
+
+    thAudioRef.current.play().catch(err => console.log("Audio play error:", err));
+    thAudioRef.current.onended = () => {
+      enAudioRef.current?.play().catch(err => console.log("Audio play error:", err));
+    };
+
+    return () => {
+      thAudioRef.current?.pause();
+      thAudioRef.current!.currentTime = 0;
+      enAudioRef.current?.pause();
+      enAudioRef.current!.currentTime = 0;
+    };
+  }, []);
+
   const captureAndClassify = () => {
+    thAudioRef.current?.pause();
+    thAudioRef.current!.currentTime = 0;
+    enAudioRef.current?.pause();
+    enAudioRef.current!.currentTime = 0;
+
     if (!videoRef.current || !canvasRef.current) return;
 
     const video = videoRef.current;

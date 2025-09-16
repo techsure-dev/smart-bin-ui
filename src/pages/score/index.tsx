@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import { Flex } from "antd";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import Header from "../../component/Header";
-import InputScore from "./component/InputScore";
+import InputPhoneNumber from "./component/InputPhoneNumber";
 import SuccessScore from "./component/SuccessScore";
+import { usePoints } from "../../context/PointsContext";
+
 
 const ScorePage = () => {
-  const navigate = useNavigate();
   const [inputValue, setInputValue] = useState<string>("");
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [skipped, setSkipped] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(10);
+  const { totalPoints, resetResults } = usePoints();
+
 
   const handleKeyPress = (key: string) => {
     if (key === "x") {
@@ -33,21 +35,16 @@ const ScorePage = () => {
     setSubmitted(true);
   };
 
-  useEffect(() => {
-    if (!submitted) return;
+    useEffect(() => {
+      if (!submitted) return;
 
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev === 1) {
-          clearInterval(timer);
-          navigate("/");
-        }
-        return prev - 1;
-      });
-    }, 1000);
+      const timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
 
-    return () => clearInterval(timer);
-  }, [submitted, navigate]);
+      return () => clearInterval(timer);
+    }, [submitted]);
+
 
   return (
     <Flex className="absolute w-full h-screen bg-white flex flex-col items-center justify-start transition-opacity duration-500 z-10">
@@ -64,7 +61,7 @@ const ScorePage = () => {
             exit={{ opacity: 0, y: -100 }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
           >
-            <InputScore
+            <InputPhoneNumber
               inputValue={inputValue}
               onKeyPress={handleKeyPress}
               onSkip={handleSkip}
@@ -79,7 +76,13 @@ const ScorePage = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
-            <SuccessScore countdown={countdown} skipped={skipped} />
+            <SuccessScore 
+              countdown={countdown} 
+              skipped={skipped} 
+              totalPoints={totalPoints} 
+              resetResults={resetResults} 
+              phoneNumber={inputValue}
+            />
           </motion.div>
         )}
       </AnimatePresence>

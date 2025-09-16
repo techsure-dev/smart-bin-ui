@@ -1,11 +1,12 @@
 import { Flex, Typography } from "antd";
 import ArrowIcon from "../../../assets/icons/arrow.svg?react";
 
-const {Text} = Typography
+const { Text } = Typography;
 
 interface CategoryCardProps {
   image: string;
   header: string;
+  fade?: boolean; 
   bgColor?: string;     
   iconColor?: string;   
   textColor?: string;  
@@ -14,17 +15,16 @@ interface CategoryCardProps {
 const CategoryCard = ({
   image,
   header,
+  fade = true,
   bgColor = "#F0F0F0",
   iconColor = "#000",
   textColor = "#000",
 }: CategoryCardProps) => {
   
   return (
-    <Flex
-      className="flex flex-col items-center p-3"
-    >
+    <Flex className="flex flex-col items-center p-3">
       {/* Image */}
-       <div
+      <div
         className="flex items-center justify-center mb-2"
         style={{
           width: "174px", 
@@ -39,7 +39,8 @@ const CategoryCard = ({
         />
       </div>
 
-      <div className="flex flex-col items-center">
+      {/* Arrow */}
+      <div className="flex flex-col items-center mb-2">
         <ArrowIcon className="h-16 w-8 animate-bounce" fill={iconColor} />
       </div>
 
@@ -55,7 +56,12 @@ const CategoryCard = ({
           textAlign: "center",
         }}
       >
-        <Text className="text-heading-xs font-bold" style={{ color: textColor }}>
+        <Text
+          className={`text-heading-xs font-bold transition-opacity duration-300 ${
+            fade ? "animate-fadeIn" : "animate-fadeOut"
+          }`}
+          style={{ color: textColor }}
+        >
           {header}
         </Text>
       </Flex>

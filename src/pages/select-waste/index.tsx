@@ -1,6 +1,6 @@
 import { Flex, Typography } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useRef  } from "react";
 import AIProfileAnimation from "./component/AnimationContext";
 import Header from "../../component/Header";
 import WasteCard from "../prediction/component/WasteCard";
@@ -9,6 +9,7 @@ import checkMark from "../../assets/icons/check_mark.png";
 import ArrowIcon from "../../assets/icons/arrow.svg?react";
 import { motion } from "framer-motion";
 import WasteBinCard from "../prediction/component/WasteBinCard";
+import { textToSpeech } from "../../api/audioWaste";
 
 const { Text } = Typography;
 
@@ -20,12 +21,17 @@ const SelectWastePage = () => {
   const item_en = location.state?.item_en;
   const selectedCategory_th = location.state?.selectedCategory_th;
   const selectedCategory_en = location.state?.selectedCategory_en;
+  const weight_g = location.state?.weight_g;
+  const point_map = location.state?.point_map;
 
   if (!item_th || !selectedCategory_th) return <div>No category selected</div>;
 
   const selectedCategory = selectedCategory_th;
 
   const waste = wasteMap[selectedCategory];
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
 
  
   useEffect(() => {
@@ -36,12 +42,69 @@ const SelectWastePage = () => {
           item_en,
           selectedCategory_th,
           selectedCategory_en,
+          weight_g,
+          point_map
         },
       });
-    }, 3000);
+    }, 6000);
 
     return () => clearTimeout(timer);
   }, [navigate, item_th, item_en, selectedCategory_th, selectedCategory_en]);
+
+    const playAudio = (src: Blob | string, rate = 1) => {
+      return new Promise<void>((resolve, reject) => {
+        const audio = audioRef.current;
+        if (!audio) return reject("Audio ref is null");
+
+        audio.src = src instanceof Blob ? URL.createObjectURL(src) : src;
+
+        const onCanPlay = () => {
+          audio.playbackRate = rate;
+          audio.play().catch(reject);
+        };
+
+        const onEnded = () => {
+          audio.removeEventListener("ended", onEnded);
+          audio.removeEventListener("canplay", onCanPlay);
+          resolve();
+        };
+
+        audio.addEventListener("canplay", onCanPlay);
+        audio.addEventListener("ended", onEnded);
+      });
+    };
+
+  useEffect(() => {
+    const playWasteAudio = async () => {
+      try {
+        // Play item name in Thai
+        const thBlob = await textToSpeech(item_th);
+        await playAudio(thBlob, 1.5);
+
+        // Play item name in English
+        const enBlob = await textToSpeech(item_en);
+        await playAudio(enBlob, 1.5);
+
+        // Play waste type audio Thai
+        if (waste?.soundTh) {
+          const thWasteBlob = await fetch(waste.soundTh).then(res => res.blob());
+          await playAudio(thWasteBlob);
+        }
+
+        // Play waste type audio English
+        if (waste?.soundEn) {
+          const enWasteBlob = await fetch(waste.soundEn).then(res => res.blob());
+          await playAudio(enWasteBlob);
+        }
+      } catch (err) {
+        console.error("Audio playback error:", err);
+      }
+    };
+
+    playWasteAudio();
+  }, [item_th, item_en, waste]);
+
+
 
   return (
     <Flex className="absolute w-full h-screen bg-white flex flex-col items-center justify-start transition-opacity duration-500 z-10">
@@ -70,8 +133,6 @@ const SelectWastePage = () => {
           <WasteCard
             item_th={item_th}
             item_en={item_en}
-            type_th={selectedCategory_th}
-            type_en={selectedCategory_en}
             image={waste.image}
             bgColor={waste.bgColor}
             textColor={waste.textColor}
@@ -107,6 +168,9 @@ const SelectWastePage = () => {
           textColor={waste.textColor}
         />
       </motion.div>
+
+      <audio ref={audioRef} preload="auto" />
+      
     </Flex>
   );
 };

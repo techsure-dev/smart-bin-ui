@@ -59,7 +59,7 @@ const WasteBinCard = ({
         }}
       >
         <Text
-          className="text-heading-xs font-bold mt-20" 
+          className="text-heading-xs font-bold mt-12" 
           style={{ color: textColor }}
         >
           {type}

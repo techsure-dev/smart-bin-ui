@@ -6,47 +6,68 @@ import Header from "../../component/Header";
 import WasteBinCard from "./component/WasteBinCard";
 import { wasteMap } from "../../types/wasteType"; 
 import { motion } from "framer-motion";
+import { useTank } from "../../context/TankContext";
 
 const { Text } = Typography;
 
+const wasteIndexMap: Record<WasteCategory, number> = {
+  "ขยะกำพร้า": 0,
+  "ขยะทั่วไป": 1,
+  "ขวดพลาสติก": 2,
+  "ขวดแก้ว กระป๋อง โลหะ อะลูมิเนียม": 3,
+  "ขยะอันตราย": 4,
+};
 
 const allCategories: { th: WasteCategory; en: string }[] = [
   { th: "ขยะกำพร้า", en: "Refused Derived Fuel (RDF)" },
   { th: "ขยะทั่วไป", en: "General Waste" },
   { th: "ขวดพลาสติก", en: "Plastic Bottle" },
-  { th: "แก้ว โลหะ อะลูมิเนียม", en: "Glass / Can / Metal / Aluminium" },
+  { th: "ขวดแก้ว กระป๋อง โลหะ อะลูมิเนียม", en: "Glass / Can / Metal / Aluminium" },
   { th: "ขยะอันตราย", en: "Hazardous Waste" },
 ];
 
 const OptionPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { setTankIndex } = useTank();
 
   const state = location.state as {
-    result?: { item_th: string; item_en: string; type_th: WasteCategory; type_en: string }[];
+    result?: { 
+      item_th: string; 
+      item_en: string; 
+      type_th: WasteCategory; 
+      type_en: string;
+      weight_g: number; 
+      point_map: string;
+    }[];
   };
 
   const results = state?.result || [];
-
   const predictedTypes: WasteCategory[] = results.map(r => r.type_th);
 
-const options = allCategories.filter(
-  (cat) => !predictedTypes.includes(cat.th)
-);
+  const options = allCategories.filter(
+    (cat) => !predictedTypes.includes(cat.th)
+  );
 
-  
 
-const handleSelect = (selected: { th: WasteCategory; en: string }) => {
-  const firstItem = results[0];
-  navigate("/select-waste", {
-    state: {
-      item_th: firstItem?.item_th,
-      item_en: firstItem?.item_en,
-      selectedCategory_th: selected.th,
-      selectedCategory_en: selected.en,
-    },
-  });
-};
+  const handleSelect = (selected: { th: WasteCategory; en: string }) => {
+    const firstItem = results[0];
+
+    const tankIndex = wasteIndexMap[selected.th];
+    console.log("👉 OptionPage setTankIndex:", tankIndex);
+    setTankIndex(tankIndex); 
+
+    navigate("/select-waste", {
+      state: {
+        item_th: firstItem?.item_th,
+        item_en: firstItem?.item_en,
+        selectedCategory_th: selected.th,
+        selectedCategory_en: selected.en,
+        weight_g: firstItem?.weight_g,
+        point_map: firstItem?.point_map,  
+      },
+    });
+  };
 
 
   return (

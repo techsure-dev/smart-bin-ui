@@ -1,54 +1,74 @@
 import { Flex, Typography } from "antd";
 import showScoreImage from "../../../assets/images/show_score.png";
-import { textToSpeech } from "../../../api/audioWaste"; 
 import { useEffect, useRef } from "react";
+import successThsound from "../../../assets/sound/1-ไม่มีใครรั.mp3";
+import successEnsound from "../../../assets/sound/4-Nooneloves.mp3";
+import WastePointDisplay from "./WastePointDisplay";
+import { usePoints } from "../../../context/PointsContext"; 
+import { collectScore } from "../../../api/collectScore";
+import { useNavigate } from "react-router-dom";
+import { useTank } from "../../../context/TankContext";
 
 const { Text } = Typography;
 
 interface SuccessScoreProps {
   countdown: number;
   skipped?: boolean;
+  totalPoints: number;
+  resetResults?: () => void;
+   phoneNumber: string; 
 }
 
-const SuccessScore = ({ countdown, skipped = false }: SuccessScoreProps) => {
+const SuccessScore = ({ countdown, skipped = false, phoneNumber }: SuccessScoreProps) => {
+  const navigate = useNavigate();
+  const { totalPoints, listOfPoints , resetResults } = usePoints(); 
+  const hasNavigatedRef = useRef(false);
+  const { tankValues } = useTank();
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
   useEffect(() => {
-    const playAudio = async () => {
+    if (!audioRef.current) return;
+    const audioEl = audioRef.current;
+    audioEl.src = successThsound;
+    audioEl.play().catch(() => {});
+    const playEnglish = () => {
+      audioEl.onended = null;
+      audioEl.src = successEnsound;
+      audioEl.play().catch(() => {});
+    };
+    audioEl.onended = playEnglish;
+    return () => {
+      audioEl.onended = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (skipped) return;
+
+    const sendPoints = async () => {
       try {
-        const thText = "ไม่มีใครรักโลกเท่า คุณวัชราภรณ์ แล้วล่ะ";
-        const enText = "No one loves the Earth more than khun watcharaporn.";
-        
-    
-        const thBlob = await textToSpeech(thText);
-        const thUrl = URL.createObjectURL(thBlob);
-
-        if (audioRef.current) {
-          audioRef.current.src = thUrl;
-          await audioRef.current.play().catch(() => {});
-
-          audioRef.current.onended = async () => {
-            const enBlob = await textToSpeech(enText);
-            const enUrl = URL.createObjectURL(enBlob);
-            if (audioRef.current) {
-              audioRef.current.src = enUrl;
-              await audioRef.current.play().catch(() => {});
-            }
-          };
-        }
+        const results = await collectScore(phoneNumber, listOfPoints);
+        console.log("✅ All points submitted successfully:", results);
+          console.log("Current tank values after sending points:", tankValues);
       } catch (err) {
-        console.error("TTS play error:", err);
+        console.error("❌ Failed to submit points", err);
       }
     };
 
-    playAudio();
-  }, []);
-  
+    sendPoints();
+  }, [phoneNumber, skipped, listOfPoints, tankValues]);
+
+
+  useEffect(() => {
+    if (countdown === 0 && !hasNavigatedRef.current) {
+      hasNavigatedRef.current = true;
+      resetResults?.(); 
+      navigate("/");  
+    }
+  }, [countdown, resetResults, navigate]);
   return (
-    <Flex
-      vertical
-      className="flex-col items-center justify-between w-full h-screen px-4" 
-    >
+    <Flex vertical className="flex-col items-center justify-between w-full h-screen px-4">
       <Flex vertical className="items-center mt-48">
         <img
           src={showScoreImage}
@@ -59,24 +79,19 @@ const SuccessScore = ({ countdown, skipped = false }: SuccessScoreProps) => {
           <Text className="font-bold text-heading-xl text-center mt-10 px-32">
             ไม่มีใครรักโลกเท่า{" "}
             <Text className="text-text-brand text-heading-xl font-bold">
-              คุณวัราภรณ์
+              คุณ
             </Text>
             {"\n"}แล้วล่ะ ✨
           </Text>
 
-            <Text className="font-bold text-heading-xs text-text-subtitle">
-            No one loves the Earth more than Khun watcharaporn.
+          <Text className="font-bold text-heading-xs text-text-subtitle">
+            No one loves the Earth more than You.
           </Text>
         </Flex>
+
         {!skipped && (
-          <Flex vertical className="w-[600px] h-fit bg-background-light rounded-full items-center justify-center mt-20 p-4">
-            <Text className="text-heading-s text-center text-text-title">
-              คะแนนสะสม{" "}
-              <span className="text-text-brand font-bold">654</span> คะแนน
-            </Text>
-             <Text className="text-heading-xs font-bold text-center text-text-subtitle">
-              You have 654 points.
-            </Text>
+          <Flex vertical className="min-w-[735px] h-fit bg-background-light rounded-full items-center justify-center mt-20 px-7 py-14">
+            <WastePointDisplay totalPoint={totalPoints} />
           </Flex>
         )}
       </Flex>
@@ -87,7 +102,7 @@ const SuccessScore = ({ countdown, skipped = false }: SuccessScoreProps) => {
         </Text>
       </Flex>
 
-        <audio ref={audioRef} preload="auto" />
+      <audio ref={audioRef} preload="auto" />
     </Flex>
   );
 };
