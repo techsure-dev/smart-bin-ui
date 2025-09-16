@@ -21,13 +21,13 @@ interface SuccessScoreProps {
 
 const SuccessScore = ({ countdown, skipped = false, phoneNumber }: SuccessScoreProps) => {
   const navigate = useNavigate();
-  const { totalPoints, listOfPoints, resetResults } = usePoints(); 
+  const { totalPoints, listOfPoints , resetResults } = usePoints(); 
   const hasNavigatedRef = useRef(false);
-
-  const { tankValues, requestReadAll } = useTank();
+  
+  const { readDataAll, tankValues } = useTank();
+  const [usbMessages, setUsbMessages] = useState<string[]>([]);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [showTankValues, setShowTankValues] = useState<number[] | null>(null);
 
   // ------------------- Audio -------------------
   useEffect(() => {
@@ -41,59 +41,57 @@ const SuccessScore = ({ countdown, skipped = false, phoneNumber }: SuccessScoreP
       audioEl.play().catch(() => {});
     };
     audioEl.onended = playEnglish;
-    return () => { audioEl.onended = null; };
+    return () => {
+      audioEl.onended = null;
+    };
   }, []);
 
-  // ------------------- Send Points -------------------
+  // ------------------- Send points -------------------
   useEffect(() => {
     if (skipped) return;
-    let cancelled = false;
 
     const sendPoints = async () => {
       try {
-        // request fresh tank values before sending
-        const freshTanks = await requestReadAll();
-        if (cancelled) return;
-        console.log("Fresh tank values before sending points:", freshTanks);
-        
         const results = await collectScore(phoneNumber, listOfPoints);
-        console.log("✅ Points submitted:", results);
+        console.log("✅ All points submitted successfully:", results);
+        console.log("Current tank values after sending points:", tankValues);
       } catch (err) {
-        if (!cancelled) console.error("❌ Failed to submit points", err);
+        console.error("❌ Failed to submit points", err);
       }
     };
 
     sendPoints();
-    return () => { cancelled = true; };
-  }, [phoneNumber, skipped, listOfPoints, requestReadAll]);
+  }, [phoneNumber, skipped, listOfPoints, tankValues]);
 
-  // ------------------- Countdown Navigation -------------------
+  // ------------------- USB readDataAll and messages -------------------
+  useEffect(() => {
+    // Local handler for incoming USB messages
+    const handleUsbMessage = (message: string) => {
+      setUsbMessages(prev => [...prev, message]);
+      console.log("USB message (SuccessScore):", message);
+    };
+
+    // Subscribe globally
+    const originalHandler = window.onUsbMessage;
+    window.onUsbMessage = handleUsbMessage;
+
+    // Trigger read all tanks automatically
+    readDataAll();
+
+    return () => {
+      // Restore original handler when leaving page
+      window.onUsbMessage = originalHandler;
+    };
+  }, [readDataAll]);
+
+  // ------------------- Countdown navigation -------------------
   useEffect(() => {
     if (countdown === 0 && !hasNavigatedRef.current) {
       hasNavigatedRef.current = true;
-      let cancelled = false;
-
-      const navigateAfterTankRead = async () => {
-        try {
-          // request fresh tank values before navigating
-        const freshTanks = await requestReadAll();
-          if (cancelled) return;
-          console.log("Tank values:", freshTanks);
-
-          resetResults?.();
-          navigate("/");
-        } catch (err) {
-          console.error("Failed to read tanks:", err);
-          resetResults?.();
-          navigate("/");
-        }
-      };
-
-      navigateAfterTankRead();
-
-      return () => { cancelled = true; };
+      resetResults?.(); 
+      navigate("/");  
     }
-  }, [countdown, resetResults, navigate, requestReadAll]);
+  }, [countdown, resetResults, navigate]);
 
   // ------------------- Render -------------------
   return (
@@ -107,9 +105,12 @@ const SuccessScore = ({ countdown, skipped = false, phoneNumber }: SuccessScoreP
         <Flex vertical className="items-center justify-center">
           <Text className="font-bold text-heading-xl text-center mt-10 px-32">
             ไม่มีใครรักโลกเท่า{" "}
-            <Text className="text-text-brand text-heading-xl font-bold">คุณ</Text>
+            <Text className="text-text-brand text-heading-xl font-bold">
+              คุณ
+            </Text>
             {"\n"}แล้วล่ะ ✨
           </Text>
+
           <Text className="font-bold text-heading-xs text-text-subtitle">
             No one loves the Earth more than You.
           </Text>
@@ -120,20 +121,11 @@ const SuccessScore = ({ countdown, skipped = false, phoneNumber }: SuccessScoreP
             <WastePointDisplay totalPoint={totalPoints} />
           </Flex>
         )}
-
-        {showTankValues && (
-          <Flex vertical className="mt-4">
-            <Text className="font-bold text-heading-xs text-text-subtitle">
-              Tank Values before exit: {showTankValues.join(", ")}
-            </Text>
-          </Flex>
-        )}
       </Flex>
 
       <Flex vertical className="items-center mt-auto mb-64">
         <Text className="font-bold text-heading-xs text-center text-text-subtitle">
-          กำลังกลับสู่หน้าหลัก (Back to home) (
-          <span className="text-text-brand font-bold">{countdown}</span>)
+           กำลังกลับสู่หน้าหลัก (Back to home) (<span className="text-text-brand font-bold">{countdown}</span>)
         </Text>
       </Flex>
 
