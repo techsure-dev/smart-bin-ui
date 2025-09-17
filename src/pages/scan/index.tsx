@@ -158,7 +158,7 @@ const ScanPage = () => {
               objectFit: "cover",
               transform: "rotate(-90deg)",
               transformOrigin: "center",
-              objectPosition: "left-center"
+              objectPosition: "left"
             }}
             autoPlay
             muted
