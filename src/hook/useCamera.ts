@@ -14,7 +14,7 @@ export const useCamera = () => {
   };
 
   // Start camera with desired resolution
-  const startCamera = async (deviceId?: string) => {
+  const startCamera = async (deviceId?: string) => {     
     try {
       const constraints: MediaStreamConstraints = {
         video: {
