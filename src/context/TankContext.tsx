@@ -5,9 +5,10 @@ type TankContextType = {
   setTankIndex: (index: number | null) => void;
   tankValues: number[];
   setTankValues: React.Dispatch<React.SetStateAction<number[]>>;
-  readDataAll: () => void;        
-  addUsbMessage: (msg: string) => void; 
-  openTank: (index: number) => void;   
+  readDataAll: () => void;
+  addUsbMessage: (msg: string) => void;   
+  logUsbReceived: (msg: string) => void; 
+  openTank: (index: number) => void;
 };
 
 const TankContext = createContext<TankContextType | undefined>(undefined);
@@ -18,21 +19,24 @@ export const TankProvider = ({ children }: { children: React.ReactNode }) => {
 
   // ------------------- Logging -------------------
   const addUsbMessage = (msg: string) => {
-    console.log("USB Message:", msg);
+    console.log("📤 Sent:", msg);
+  };
+
+  const logUsbReceived = (msg: string) => {
+    console.log("📥 Received:", msg);
   };
 
   // ------------------- Tank Control -------------------
   const openTank = (index: number) => {
     if (window.USB?.send) {
-      console.log("👉 Opening tank:", index);
-      window.USB.send(`F ${index} 5000\n`);
-      addUsbMessage(`Sent command → F ${index} 5000`);
+      const command = `F ${index} 5000`;
+      window.USB.send(command + "\n");
+      addUsbMessage(`Sent command → ${command}`);
     } else {
       addUsbMessage("USB not available for sending.");
     }
   };
 
-  // Whenever tankIndex changes → auto open
   useEffect(() => {
     if (tankIndex !== null) {
       openTank(tankIndex);
@@ -42,10 +46,11 @@ export const TankProvider = ({ children }: { children: React.ReactNode }) => {
   // ------------------- Read Data -------------------
   const readDataAll = () => {
     if (window.USB?.send) {
-      window.USB.send("P 9 9\n");
-      addUsbMessage("Sent command → P 9 9");
+      const command = "P 9 9";
+      window.USB.send(command + "\n");
+      addUsbMessage(`Sent command → ${command}`);
     } else {
-      addUsbMessage("USB not available .");
+      addUsbMessage("USB not available.");
     }
   };
 
@@ -58,7 +63,8 @@ export const TankProvider = ({ children }: { children: React.ReactNode }) => {
         setTankValues,
         readDataAll,
         addUsbMessage,
-        openTank, 
+        logUsbReceived,
+        openTank,
       }}
     >
       {children}

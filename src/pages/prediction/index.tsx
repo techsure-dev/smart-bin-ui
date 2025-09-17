@@ -111,8 +111,8 @@ const PredictionPage = () => {
         const tankIndex = wasteIndexMap[results[0].type_th];
         console.log("⏱ Auto sending tankIndex:", tankIndex);
 
-        setTankIndex(tankIndex); // update context
-        openTank(tankIndex);     // immediately open tank
+        setTankIndex(tankIndex); 
+        openTank(tankIndex);     
 
         navigate("/correct", { state: { result: results } });
       }
