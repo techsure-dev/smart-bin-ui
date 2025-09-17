@@ -69,31 +69,31 @@ const ScanPage = () => {
   }, []);
 
 
-  // useEffect(() => {
-  //   const thAudio = thAudioRef.current;
-  //   const enAudio = enAudioRef.current;
-  //   if (!thAudio || !enAudio) return;
+  useEffect(() => {
+    const thAudio = thAudioRef.current;
+    const enAudio = enAudioRef.current;
+    if (!thAudio || !enAudio) return;
 
-  //   let autoBackTimer: NodeJS.Timeout;
+    let autoBackTimer: NodeJS.Timeout;
 
-  //   const startAutoBackTimer = () => {
-  //     autoBackTimer = setTimeout(() => navigate("/"), 5000);
-  //   };
+    const startAutoBackTimer = () => {
+      autoBackTimer = setTimeout(() => navigate("/"), 5000);
+    };
 
-  //   thAudio.play().catch(err => console.log("Audio play error:", err));
-  //   thAudio.onended = () => {
-  //     enAudio.play().catch(err => console.log("Audio play error:", err));
-  //     enAudio.onended = () => startAutoBackTimer();
-  //   };
+    thAudio.play().catch(err => console.log("Audio play error:", err));
+    thAudio.onended = () => {
+      enAudio.play().catch(err => console.log("Audio play error:", err));
+      enAudio.onended = () => startAutoBackTimer();
+    };
 
-  //   return () => {
-  //     clearTimeout(autoBackTimer);
-  //     thAudio.pause();
-  //     thAudio.currentTime = 0;
-  //     enAudio.pause();
-  //     enAudio.currentTime = 0;
-  //   };
-  // }, [navigate]);
+    return () => {
+      clearTimeout(autoBackTimer);
+      thAudio.pause();
+      thAudio.currentTime = 0;
+      enAudio.pause();
+      enAudio.currentTime = 0;
+    };
+  }, [navigate]);
 
   const captureAndClassify = () => {
     if (!videoRef.current || !canvasRef.current) return;
@@ -158,7 +158,7 @@ const ScanPage = () => {
               objectFit: "cover",
               transform: "rotate(-90deg)",
               transformOrigin: "center",
-              
+              objectPosition: "left-center"
             }}
             autoPlay
             muted
