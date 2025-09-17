@@ -21,7 +21,7 @@ interface SuccessScoreProps {
 
 const SuccessScore = ({ countdown, skipped = false, phoneNumber }: SuccessScoreProps) => {
   const navigate = useNavigate();
-  const { totalPoints, listOfPoints , resetResults } = usePoints(); 
+  const { totalPoints, listOfPoints } = usePoints(); 
   const hasNavigatedRef = useRef(false);
   
   const { readDataAll } = useTank();
@@ -83,10 +83,9 @@ const SuccessScore = ({ countdown, skipped = false, phoneNumber }: SuccessScoreP
   useEffect(() => {
     if (countdown === 0 && !hasNavigatedRef.current) {
       hasNavigatedRef.current = true; 
-      navigate("/");
-      resetResults?.();   
+      navigate("/");  // <-- Do NOT resetResults here
     }
-  }, [countdown, resetResults, navigate]);
+  }, [countdown, navigate]);
   
   // ------------------- Render -------------------
   return (
@@ -119,8 +118,16 @@ const SuccessScore = ({ countdown, skipped = false, phoneNumber }: SuccessScoreP
       </Flex>
 
       <Flex vertical className="items-center mt-auto mb-64">
-        <Text className="font-bold text-heading-xs text-center text-text-subtitle">
-           กำลังกลับสู่หน้าหลัก (Back to home) (<span className="text-text-brand font-bold">{countdown}</span>)
+        <Text
+          className="font-bold text-heading-xs text-center text-text-subtitle cursor-pointer"
+          onClick={() => {
+            if (!hasNavigatedRef.current) {
+              hasNavigatedRef.current = true;
+              navigate("/");
+            }
+          }}
+        >
+          กำลังกลับสู่หน้าหลัก (Back to home) (<span className="text-text-brand font-bold">{countdown}</span>)
         </Text>
       </Flex>
 

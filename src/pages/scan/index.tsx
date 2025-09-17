@@ -141,18 +141,18 @@ const ScanPage = () => {
           วางขยะให้อยู่ในกรอบ
         </Text>
         <Text className="font-bold text-heading-s text-text-light">
-          Keep the trash inside the circle.
+          Keep the trash inside the box.
         </Text>
       </Flex>
 
-      <img src={dot} alt="dot" className="absolute w-[1260px] h-[1260px] object-contain z-10 animate-floatUpDown" />
-      <img src={arrow_left} alt="left" className="absolute left-[calc(43%-600px)] top-1/2 transform -translate-y-1/2 w-[260px] h-[260px] z-20 cursor-pointer animate-leftToRight" />
-      <img src={arrow_right} alt="right" className="absolute right-[calc(45%-600px)] top-1/2 transform -translate-y-1/2 w-[260px] h-[260px] z-20 cursor-pointer animate-rightToLeft" />
+      <img src={dot} alt="dot" className="absolute w-[2100px] h-[2100px] object-contain z-10 animate-floatUpDown" />
+      <img src={arrow_left} alt="left" className="absolute left-[calc(40%-600px)] top-1/2 transform -translate-y-1/2 w-[260px] h-[260px] z-20 cursor-pointer animate-leftToRight" />
+      <img src={arrow_right} alt="right" className="absolute right-[calc(40%-600px)] top-1/2 transform -translate-y-1/2 w-[260px] h-[260px] z-20 cursor-pointer animate-rightToLeft" />
 
-      <div className="absolute w-[720px] h-[720px] rounded-full overflow-hidden flex items-center justify-center z-30 border-[14px] border-[#AF6214]">
+      <div className="absolute w-[750px] h-[1080px] overflow-hidden flex items-center justify-center z-30 border-[14px] border-[#AF6214] rounded-3xl bg-white">
         <video
             ref={videoRef}
-            className="w-full h-full object-cover bg-white"
+            className="w-full h-full object-cover"
             style={{
               transform: "rotate(-90deg)",
               transformOrigin: "center",

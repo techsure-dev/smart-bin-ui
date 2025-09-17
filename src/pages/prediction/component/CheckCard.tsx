@@ -22,18 +22,18 @@ const CheckCard = ({ onCorrect, onWrong }: CheckCardProps) => {
         </Text>
       </Flex>
 
-      <div className="absolute left-[50%] top-[85%] -translate-x-1/2 flex w-full justify-around px-16 z-30">
+      <div className="absolute left-[40%] top-[85%] -translate-x-1/2 flex w-full justify-around px-16 z-30">
         <img
           src={crossMark}
           alt="cross mark"
-          className="h-[80px] w-[80px] object-contain cursor-pointer"
+          className="h-[120px] w-[120px] object-contain cursor-pointer"
           onClick={onWrong} 
         />
 
         <img
           src={checkMark}
           alt="check mark"
-          className="h-[80px] w-[80px] object-contain cursor-pointer"
+          className="h-[120px] w-[120px] object-contain cursor-pointer"
           onClick={onCorrect} 
         />
       </div>

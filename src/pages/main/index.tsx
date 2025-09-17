@@ -13,6 +13,7 @@ import Header from "../../component/Header";
 import mianThSound from "../../assets/sound/0-มาช่วยกันแ.mp3";
 import mianEnSound from "../../assets/sound/3-Let'shelps.mp3";
 import { useTank } from "../../context/TankContext";
+import { usePoints } from "../../context/PointsContext";
 
 
 const { Text } = Typography;
@@ -38,6 +39,7 @@ const MainPage = () => {
   const [videoLoading, setVideoLoading] = useState(true); 
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
+  const { totalPoints, listOfPoints, resetResults } = usePoints();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -53,25 +55,32 @@ const MainPage = () => {
 
  // ------------------- USB readDataAll and messages -------------------
   useEffect(() => {
-  const handleUsbMessage = (message: string) => {
-    setUsbMessages(prev => [...prev, message]);
-    console.log("USB message (SuccessScore):", message);
-  };
+    const handleUsbMessage = (message: string) => {
+      setUsbMessages(prev => [...prev, message]);
+      console.log("USB message (SuccessScore):", message);
+    };
 
-  const originalHandler = window.onUsbMessage;
-  window.onUsbMessage = handleUsbMessage;
-  readDataAll();
-
-  const intervalId = setInterval(() => {
+    const originalHandler = window.onUsbMessage;
+    window.onUsbMessage = handleUsbMessage; 
     readDataAll();
-  }, 10000); 
 
-  return () => {
-    window.onUsbMessage = originalHandler;
-    clearInterval(intervalId);
-  };
-}, [readDataAll]);
+    const intervalId = setInterval(() => {
+      readDataAll();
+    }, 10000); 
 
+    return () => {
+      window.onUsbMessage = originalHandler;
+      clearInterval(intervalId);
+    };
+  }, [readDataAll]);
+
+  // ------------------- reset point -------------------
+  useEffect(() => {
+    if ((totalPoints > 0 || listOfPoints.length > 0) && resetResults) {
+      resetResults();
+      console.log("✅ Points reset");
+    }
+  }, [totalPoints, listOfPoints, resetResults]);
 
 
   const startVideoTimeout = () => {

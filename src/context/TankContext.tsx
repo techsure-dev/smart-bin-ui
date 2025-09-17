@@ -45,7 +45,7 @@ export const TankProvider = ({ children }: { children: React.ReactNode }) => {
       window.USB.send("P 9 9\n");
       addUsbMessage("Sent command → P 9 9");
     } else {
-      addUsbMessage("USB not available.");
+      addUsbMessage("USB not available .");
     }
   };
 
