@@ -17,7 +17,7 @@ export const useCamera = () => {
   const startCamera = async (deviceId?: string) => {
   try {
     const videoConstraints: MediaTrackConstraints = {
-      width: { ideal: 1040 },
+      width: { ideal: 1240 },
       height: { ideal: 750 },
     };
 
