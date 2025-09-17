@@ -100,5 +100,5 @@ html, body, #root {
 }
 
 video {
-  max-width: none; 
+  max-width: none !important; 
 }
