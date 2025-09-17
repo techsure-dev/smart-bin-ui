@@ -101,8 +101,8 @@ const ScanPage = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
 
-    canvas.width = 750;
-    canvas.height = 1040;
+    canvas.width = video.videoHeight;
+    canvas.height = video.videoWidth;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
