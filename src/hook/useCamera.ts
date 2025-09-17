@@ -15,17 +15,25 @@ export const useCamera = () => {
 
  
   const startCamera = async (deviceId?: string) => {
-    try {
-      const videoConstraints = deviceId ? { deviceId } : true;
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ video: videoConstraints });
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-      }
-      setStream(mediaStream);
-    } catch (err) {
-      console.error("Error starting camera:", err);
+  try {
+    const videoConstraints: MediaTrackConstraints = {
+      width: { ideal: 1040 },
+      height: { ideal: 750 },
+    };
+
+    if (deviceId) videoConstraints.deviceId = { exact: deviceId };
+
+    const mediaStream = await navigator.mediaDevices.getUserMedia({ video: videoConstraints });
+    if (videoRef.current) {
+      videoRef.current.srcObject = mediaStream;
+      await videoRef.current.play();
     }
-  };
+    setStream(mediaStream);
+  } catch (err) {
+    console.error("Error starting camera:", err);
+  }
+};
+
 
 
   const stopCamera = () => {
