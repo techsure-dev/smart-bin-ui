@@ -101,8 +101,8 @@ const ScanPage = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
 
-    canvas.width = video.videoHeight;
-    canvas.height = video.videoWidth;
+    canvas.width = 750;
+    canvas.height = 1040;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -149,11 +149,13 @@ const ScanPage = () => {
       <img src={arrow_left} alt="left" className="absolute left-[calc(40%-600px)] top-1/2 transform -translate-y-1/2 w-[260px] h-[260px] z-20 cursor-pointer animate-leftToRight" />
       <img src={arrow_right} alt="right" className="absolute right-[calc(40%-600px)] top-1/2 transform -translate-y-1/2 w-[260px] h-[260px] z-20 cursor-pointer animate-rightToLeft" />
 
-      <div className="absolute w-[750px] h-[1060px] rounded-3xl overflow-hidden flex items-center justify-center z-30 border-[14px] border-[#AF6214]">
+      <div className="absolute w-[750px] h-[1040px] rounded-3xl overflow-hidden flex items-center justify-center z-30 border-[14px] border-[#AF6214]  bg-white">
         <video
             ref={videoRef}
-            className="w-full h-full object-cover bg-white"
             style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
               transform: "rotate(-90deg)",
               transformOrigin: "center",
             }}
