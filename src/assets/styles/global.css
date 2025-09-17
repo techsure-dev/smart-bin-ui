@@ -98,3 +98,7 @@ html, body, #root {
   border-color: #F97316 !important;
   color: #F97316 !important;
 }
+
+video {
+  max-width: none; 
+}

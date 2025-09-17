@@ -153,11 +153,12 @@ const ScanPage = () => {
         <video
             ref={videoRef}
             style={{
-              width: "1240px", 
+              width: "1040px", 
               height: "750px",
               objectFit: "cover",
               transform: "rotate(-90deg)",
               transformOrigin: "center",
+              
             }}
             autoPlay
             muted
