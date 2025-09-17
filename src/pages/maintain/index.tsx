@@ -1,7 +1,6 @@
 import { Button, Input, Modal } from "antd";
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTank } from "../../context/TankContext";
 
 function escapeHtml(unsafe: string) {
   return unsafe
@@ -25,9 +24,8 @@ function maintain() {
     "<i>Messages from native code will appear here...</i>",
   ]);
   const [inputData, setInputData] = useState("");
-  // const [tankValues, setTankValues] = useState([0, 0, 0, 0, 0]); // ✅ state สำหรับถัง 5 ถัง
+  const [tankValues, setTankValues] = useState([0, 0, 0, 0, 0]); // ✅ state สำหรับถัง 5 ถัง
   const messageBoxRef = useRef<HTMLDivElement>(null);
-  const { tankIndex, tankValues, setTankValues } = useTank();
 
   const addMessage = (msg: string) => {
     const time = formatTimestamp(new Date());
@@ -41,7 +39,6 @@ function maintain() {
   useEffect(() => {
     window.onUsbMessage = (message: string) => {
       addMessage(message);
-      console.log("add Messge",message)
 
       // ลองดึงเลขทั้งหมดจากข้อความ
       const nums = message
@@ -77,6 +74,7 @@ function maintain() {
     addMessage("JS Ready and DOMContentLoaded.");
   }, []);
 
+
   // ------------------- USB Fn -------------------
   const requestUsbPermission = () => {
     if (window.USB?.requestPermission) window.USB.requestPermission();
@@ -94,24 +92,14 @@ function maintain() {
   };
 
   // ------------------- Tank Control -------------------
-  useEffect(() => {
-    if (tankIndex !== null) {
-      openTank(tankIndex);   
+   const openTank = (index: number) => {
+    if (window.USB?.send) {
+      window.USB.send(`F ${index} 5000\n`);
+      addMessage(`ส่งคำสั่งเปิดถัง 'F ${index} 5000' → USB`);
+    } else {
+      addMessage("Error: USB bridge not available in JS for sending.");
     }
-  }, [tankIndex]);
-  
-const openTank = (index: number) => {
-  if (window.USB?.send) {
-    console.log("👉 tankIndex from context:", index); 
-
-    window.USB.send(`F ${index} 5000\n`);
-    addMessage(`ส่งคำสั่งเปิดถัง 'F ${index} 5000' → USB`);
-  } else {
-    addMessage("Error: USB bridge not available in JS for sending.");
-  }
-};
-
-
+  };
 
   // ✅ อ่านค่าทุกถัง
   const readDataAll = () => {
@@ -138,7 +126,7 @@ const openTank = (index: number) => {
     }
   }, [messages]);
 
-  // ------------------- back to main page -------------------
+   // ------------------- back to main page -------------------
   const navigate = useNavigate();
   const topRightClickCount = useRef(0);
   const topRightTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -157,7 +145,6 @@ const openTank = (index: number) => {
       }, 1000);
     }
   };
-
   
   // ------------------- Render -------------------
   const [isModalVisible, setIsModalVisible] = useState(true);

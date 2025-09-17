@@ -28,22 +28,20 @@ const PredictionPage = () => {
   const state = location.state as {
     result?: { item_th: string; item_en: string; type_th: string; type_en: string }[];
   };
-
   const results = state?.result || [];
 
   const [showCheckCard, setShowCheckCard] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const { setTankIndex } = useTank();
 
+  const { setTankIndex, openTank } = useTank();
 
+  // ------------------- Show CheckCard after delay -------------------
   useEffect(() => {
     const showCheckTimer = setTimeout(() => setShowCheckCard(true), 1500);
-    return () => {
-      clearTimeout(showCheckTimer);
-    };
+    return () => clearTimeout(showCheckTimer);
   }, []);
 
-
+  // ------------------- Audio playback -------------------
   useEffect(() => {
     if (!results.length) return;
 
@@ -55,20 +53,18 @@ const PredictionPage = () => {
 
     const playAudio = (src: Blob | string, rate = 1) => {
       return new Promise<void>(async (resolve, reject) => {
-        if (!audio || isCancelled) return reject("Audio ref is null or cancelled");
+        if (!audio || isCancelled) return resolve();
         audio.src = src instanceof Blob ? URL.createObjectURL(src) : src;
         const onCanPlay = () => {
           if (isCancelled) return resolve();
           audio.playbackRate = rate;
-          audio.play().catch(reject);
+          audio.play().catch(resolve);
         };
-
         const onEnded = () => {
           audio.removeEventListener("ended", onEnded);
           audio.removeEventListener("canplay", onCanPlay);
           resolve();
         };
-
         audio.addEventListener("canplay", onCanPlay);
         audio.addEventListener("ended", onEnded);
       });
@@ -76,25 +72,19 @@ const PredictionPage = () => {
 
     const playNext = async () => {
       if (index >= results.length || isCancelled) return;
-
       const wasteItem = results[index];
       const waste = wasteMap[wasteItem.type_th];
-
       try {
-        // 1️⃣ TTS Thai
         const thBlob = await textToSpeech(`${wasteItem.item_th}`);
         await playAudio(thBlob, 1.5);
 
-        // 2️⃣ TTS English
         const enBlob = await textToSpeech(`${wasteItem.item_en}`);
         await playAudio(enBlob, 1.5);
 
-        // 3️⃣ Waste type audio Thai
         if (waste?.soundTh) {
           const thWasteBlob = await fetch(waste.soundTh).then(res => res.blob());
           await playAudio(thWasteBlob);
         }
-        // 4️⃣ Waste type audio English
         if (waste?.soundEn) {
           const enWasteBlob = await fetch(waste.soundEn).then(res => res.blob());
           await playAudio(enWasteBlob);
@@ -112,6 +102,7 @@ const PredictionPage = () => {
     playNext();
   }, [results]);
 
+  // ------------------- Auto open tank and navigate -------------------
   useEffect(() => {
     if (!showCheckCard) return;
 
@@ -119,14 +110,16 @@ const PredictionPage = () => {
       if (results.length) {
         const tankIndex = wasteIndexMap[results[0].type_th];
         console.log("⏱ Auto sending tankIndex:", tankIndex);
-        setTankIndex(tankIndex);
+
+        setTankIndex(tankIndex); // update context
+        openTank(tankIndex);     // immediately open tank
+
         navigate("/correct", { state: { result: results } });
       }
     }, 8000); 
 
     return () => clearTimeout(autoNavigateTimer);
-  }, [showCheckCard]);
-
+  }, [showCheckCard, results, setTankIndex, openTank, navigate]);
 
   if (!results.length) {
     return (
@@ -189,9 +182,12 @@ const PredictionPage = () => {
                  <CheckCard
                     onCorrect={() => {
                       const tankIndex = wasteIndexMap[wasteItem.type_th];
-                      console.log("👉 Sending tankIndex:", tankIndex); 
-                      setTankIndex(tankIndex); 
-                      navigate("/correct",{ state: { result: results } });
+                      console.log("👉 Sending tankIndex:", tankIndex);
+
+                      setTankIndex(tankIndex); // update context
+                      openTank(tankIndex);     // immediately open tank
+
+                      navigate("/correct", { state: { result: results } });
                     }}
                     onWrong={() => navigate("/option", { state: { result: results } })}
                   />

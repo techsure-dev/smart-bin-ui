@@ -1,12 +1,13 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 type TankContextType = {
   tankIndex: number | null;
   setTankIndex: (index: number | null) => void;
   tankValues: number[];
   setTankValues: React.Dispatch<React.SetStateAction<number[]>>;
-  readDataAll: () => void;          // new
-  addUsbMessage: (msg: string) => void; // new
+  readDataAll: () => void;        
+  addUsbMessage: (msg: string) => void; 
+  openTank: (index: number) => void;   
 };
 
 const TankContext = createContext<TankContextType | undefined>(undefined);
@@ -15,24 +16,50 @@ export const TankProvider = ({ children }: { children: React.ReactNode }) => {
   const [tankIndex, setTankIndex] = useState<number | null>(null);
   const [tankValues, setTankValues] = useState<number[]>([0, 0, 0, 0, 0]);
 
-  // Function to log USB messages
+  // ------------------- Logging -------------------
   const addUsbMessage = (msg: string) => {
     console.log("USB Message:", msg);
   };
 
-  // Function to read all tank data
-const readDataAll = () => {
-  if (window.USB?.send) {
-    window.USB.send("P 9 9\n");
-    addUsbMessage("Sent command → P 9 9");
-  } else {
-    addUsbMessage("USB not available");
-  }
-};
+  // ------------------- Tank Control -------------------
+  const openTank = (index: number) => {
+    if (window.USB?.send) {
+      console.log("👉 Opening tank:", index);
+      window.USB.send(`F ${index} 5000\n`);
+      addUsbMessage(`Sent command → F ${index} 5000`);
+    } else {
+      addUsbMessage("USB not available for sending.");
+    }
+  };
+
+  // Whenever tankIndex changes → auto open
+  useEffect(() => {
+    if (tankIndex !== null) {
+      openTank(tankIndex);
+    }
+  }, [tankIndex]);
+
+  // ------------------- Read Data -------------------
+  const readDataAll = () => {
+    if (window.USB?.send) {
+      window.USB.send("P 9 9\n");
+      addUsbMessage("Sent command → P 9 9");
+    } else {
+      addUsbMessage("USB not available.");
+    }
+  };
 
   return (
     <TankContext.Provider
-      value={{ tankIndex, setTankIndex, tankValues, setTankValues, readDataAll, addUsbMessage }}
+      value={{
+        tankIndex,
+        setTankIndex,
+        tankValues,
+        setTankValues,
+        readDataAll,
+        addUsbMessage,
+        openTank, 
+      }}
     >
       {children}
     </TankContext.Provider>

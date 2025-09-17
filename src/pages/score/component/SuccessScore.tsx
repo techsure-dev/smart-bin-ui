@@ -65,21 +65,17 @@ const SuccessScore = ({ countdown, skipped = false, phoneNumber }: SuccessScoreP
 
   // ------------------- USB readDataAll and messages -------------------
   useEffect(() => {
-    // Local handler for incoming USB messages
     const handleUsbMessage = (message: string) => {
       setUsbMessages(prev => [...prev, message]);
       console.log("USB message (SuccessScore):", message);
     };
 
-    // Subscribe globally
     const originalHandler = window.onUsbMessage;
     window.onUsbMessage = handleUsbMessage;
 
-    // Trigger read all tanks automatically
     readDataAll();
 
     return () => {
-      // Restore original handler when leaving page
       window.onUsbMessage = originalHandler;
     };
   }, [readDataAll]);
@@ -87,12 +83,12 @@ const SuccessScore = ({ countdown, skipped = false, phoneNumber }: SuccessScoreP
   // ------------------- Countdown navigation -------------------
   useEffect(() => {
     if (countdown === 0 && !hasNavigatedRef.current) {
-      hasNavigatedRef.current = true;
-      resetResults?.(); 
-      navigate("/");  
+      hasNavigatedRef.current = true; 
+      navigate("/");
+      resetResults?.();   
     }
   }, [countdown, resetResults, navigate]);
-
+  
   // ------------------- Render -------------------
   return (
     <Flex vertical className="flex-col items-center justify-between w-full h-screen px-4">
