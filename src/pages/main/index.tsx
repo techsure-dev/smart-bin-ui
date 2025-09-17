@@ -74,14 +74,6 @@ const MainPage = () => {
     };
   }, [readDataAll]);
 
-  // ------------------- reset point -------------------
-  useEffect(() => {
-    if ((totalPoints > 0 || listOfPoints.length > 0) && resetResults) {
-      resetResults();
-      console.log("✅ Points reset");
-    }
-  }, [totalPoints, listOfPoints, resetResults]);
-
 
   const startVideoTimeout = () => {
     if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
@@ -143,6 +135,14 @@ const MainPage = () => {
   };
 
  const customIcon = <LoadingOutlined style={{ fontSize: 200, color: "#F16323" }} spin />;
+  
+ // ------------------- reset results -------------------
+  useEffect(() => {
+    if ((totalPoints > 0 || listOfPoints.length > 0) && resetResults) {
+      resetResults();
+      console.log("✅ Points reset on MainPage because there were points");
+    }
+  }, [totalPoints, listOfPoints, resetResults]);
 
   return (
     <Flex className="w-full h-full flex-col items-center justify-center relative">

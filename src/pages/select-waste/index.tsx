@@ -34,22 +34,54 @@ const SelectWastePage = () => {
 
 
  
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      navigate("/correct", {
-        state: {
-          item_th,
-          item_en,
-          selectedCategory_th,
-          selectedCategory_en,
-          weight_g,
-          point_map
-        },
-      });
-    }, 6000);
+useEffect(() => {
+  const timer = setTimeout(() => {
+    navigate("/correct", {
+      state: {
+        item_th,
+        item_en,
+        selectedCategory_th,
+        selectedCategory_en,
+        weight_g,
+        point_map
+      },
+    });
+  }, 6000);
 
-    return () => clearTimeout(timer);
-  }, [navigate, item_th, item_en, selectedCategory_th, selectedCategory_en]);
+  // Function to handle touch/click
+  const handleScreenTap = () => {
+    // Stop audio if playing
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+
+    // Clear the auto navigation timer
+    clearTimeout(timer);
+
+    // Navigate immediately
+    navigate("/correct", {
+      state: {
+        item_th,
+        item_en,
+        selectedCategory_th,
+        selectedCategory_en,
+        weight_g,
+        point_map
+      },
+    });
+  };
+
+  // Listen for touch or click events
+  window.addEventListener("click", handleScreenTap);
+  window.addEventListener("touchstart", handleScreenTap);
+
+  return () => {
+    clearTimeout(timer);
+    window.removeEventListener("click", handleScreenTap);
+    window.removeEventListener("touchstart", handleScreenTap);
+  };
+}, [navigate, item_th, item_en, selectedCategory_th, selectedCategory_en, weight_g, point_map]);
 
     const playAudio = (src: Blob | string, rate = 1) => {
       return new Promise<void>((resolve, reject) => {
