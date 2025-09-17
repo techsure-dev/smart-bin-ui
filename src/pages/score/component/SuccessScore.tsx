@@ -24,7 +24,7 @@ const SuccessScore = ({ countdown, skipped = false, phoneNumber }: SuccessScoreP
   const { totalPoints, listOfPoints , resetResults } = usePoints(); 
   const hasNavigatedRef = useRef(false);
   
-  const { readDataAll, tankValues } = useTank();
+  const { readDataAll } = useTank();
   const [usbMessages, setUsbMessages] = useState<string[]>([]);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -54,14 +54,13 @@ const SuccessScore = ({ countdown, skipped = false, phoneNumber }: SuccessScoreP
       try {
         const results = await collectScore(phoneNumber, listOfPoints);
         console.log("✅ All points submitted successfully:", results);
-        console.log("Current tank values after sending points:", tankValues);
       } catch (err) {
         console.error("❌ Failed to submit points", err);
       }
     };
 
     sendPoints();
-  }, [phoneNumber, skipped, listOfPoints, tankValues]);
+  }, [phoneNumber, skipped, listOfPoints]);
 
   // ------------------- USB readDataAll and messages -------------------
   useEffect(() => {

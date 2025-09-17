@@ -25,7 +25,8 @@ const MainPage = () => {
   const [fade, setFade] = useState(true);
 
   
-  const { readDataAll, tankValues } = useTank();
+  const { readDataAll } = useTank();
+   const [usbMessages, setUsbMessages] = useState<string[]>([]);
 
   const topRightClickCount = useRef(0);
   const topRightTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -52,16 +53,26 @@ const MainPage = () => {
 
  // ------------------- USB readDataAll and messages -------------------
   useEffect(() => {
-  const fetchTankData = () => {
-    readDataAll(); 
-    console.log("Current tank values after sending points:", tankValues);
+  const handleUsbMessage = (message: string) => {
+    setUsbMessages(prev => [...prev, message]);
+    console.log("USB message (SuccessScore):", message);
   };
 
-  fetchTankData();
+  const originalHandler = window.onUsbMessage;
+  window.onUsbMessage = handleUsbMessage;
+  readDataAll();
 
-  const interval = setInterval(fetchTankData, 60000);
-  return () => clearInterval(interval);
-}, [readDataAll, tankValues]);
+  const intervalId = setInterval(() => {
+    readDataAll();
+  }, 10000); 
+
+  return () => {
+    window.onUsbMessage = originalHandler;
+    clearInterval(intervalId);
+  };
+}, [readDataAll]);
+
+
 
   const startVideoTimeout = () => {
     if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
