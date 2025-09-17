@@ -153,8 +153,8 @@ const ScanPage = () => {
         <video
             ref={videoRef}
             style={{
-              width: "100%",
-              height: "100%",
+              width: "750", 
+              height: "1040",
               objectFit: "cover",
               transform: "rotate(-90deg)",
               transformOrigin: "center",
