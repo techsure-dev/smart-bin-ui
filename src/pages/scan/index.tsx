@@ -8,40 +8,51 @@ import dot from "../../assets/images/Dot.png";
 import arrow_left from "../../assets/images/arrow_left.png";
 import arrow_right from "../../assets/images/arrow_right.png";
 import scanThSound from "../../assets/sound/2-วางขยะให้อ.mp3";
-import scanEnSound from "../../assets/sound/5-Keepthetra.mp3";
+import scanEnSound from "../../assets/sound/Keepthetra.mp3";
 
 const { Text } = Typography;
 
 const ScanPage = () => {
-  const { videoRef, devices, startCamera } = useCamera();
+  const { videoRef, devices, startCamera, stream } = useCamera();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const navigate = useNavigate();
   const location = useLocation(); 
   const [errorMessage, setErrorMessage] = useState<string>();
-  const [loadingCamera, setLoadingCamera] = useState(true); 
+  const [loadingCamera, setLoadingCamera] = useState(!stream); 
   const thAudioRef = useRef<HTMLAudioElement | null>(null);
   const enAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Start camera
+  // Start camera if no stream
   useEffect(() => {
-    if (devices.length > 0) {
+    if (!stream && devices.length > 0) {
       const usbCamera = devices.find(d => !d.label.toLowerCase().includes("built-in")) || devices[0];
       startCamera(usbCamera.deviceId);
     }
-  }, [devices]);
+  }, [devices, stream, startCamera]);
 
-  // Camera loaded
+  // Attach existing stream to video element
+  useEffect(() => {
+    if (videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
+      videoRef.current.play().catch(() => {});
+      setLoadingCamera(false);
+    }
+  }, [videoRef, stream]);
+
+  // Handle canplay event
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    const handleCanPlay = () => setLoadingCamera(false); 
+    const handleCanPlay = () => setLoadingCamera(false);
     video.addEventListener("canplay", handleCanPlay);
+
+    if (video.readyState >= 3) setLoadingCamera(false);
 
     return () => video.removeEventListener("canplay", handleCanPlay);
   }, [videoRef]);
 
-  // Handle toast message
+  // Handle toast messages
   useEffect(() => {
     const state = location.state as { toastMessage?: string };
     if (state?.toastMessage) {
@@ -50,7 +61,7 @@ const ScanPage = () => {
     }
   }, [location.state]);
 
-  // Load and play audio
+  // Load audio
   useEffect(() => {
     thAudioRef.current = new Audio(scanThSound);
     enAudioRef.current = new Audio(scanEnSound);
@@ -67,33 +78,6 @@ const ScanPage = () => {
       enAudioRef.current!.currentTime = 0;
     };
   }, []);
-
-
-  useEffect(() => {
-    const thAudio = thAudioRef.current;
-    const enAudio = enAudioRef.current;
-    if (!thAudio || !enAudio) return;
-
-    let autoBackTimer: NodeJS.Timeout;
-
-    const startAutoBackTimer = () => {
-      autoBackTimer = setTimeout(() => navigate("/"), 5000);
-    };
-
-    thAudio.play().catch(err => console.log("Audio play error:", err));
-    thAudio.onended = () => {
-      enAudio.play().catch(err => console.log("Audio play error:", err));
-      enAudio.onended = () => startAutoBackTimer();
-    };
-
-    return () => {
-      clearTimeout(autoBackTimer);
-      thAudio.pause();
-      thAudio.currentTime = 0;
-      enAudio.pause();
-      enAudio.currentTime = 0;
-    };
-  }, [navigate]);
 
   const captureAndClassify = () => {
     if (!videoRef.current || !canvasRef.current) return;
@@ -183,10 +167,10 @@ const ScanPage = () => {
           onClick={captureAndClassify}
           type="default"
           className="h-[120px] rounded-full animate-scalePulse text-text-brand text-heading-xl font-bold flex px-8 absolute bottom-40 z-40"
-          >
-             Scan
+        >
+          Scan
         </Button>
-      )}  
+      )}
     </Flex>
   );
 };

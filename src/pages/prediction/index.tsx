@@ -52,7 +52,7 @@ const PredictionPage = () => {
     let isCancelled = false;
 
     const playAudio = (src: Blob | string, rate = 1) => {
-      return new Promise<void>(async (resolve, reject) => {
+      return new Promise<void>(async (resolve) => {
         if (!audio || isCancelled) return resolve();
         audio.src = src instanceof Blob ? URL.createObjectURL(src) : src;
         const onCanPlay = () => {

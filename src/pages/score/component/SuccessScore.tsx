@@ -25,7 +25,7 @@ const SuccessScore = ({ countdown, skipped = false, phoneNumber }: SuccessScoreP
   const hasNavigatedRef = useRef(false);
   
   const { readDataAll } = useTank();
-  const [usbMessages, setUsbMessages] = useState<string[]>([]);
+  const [_usbMessages, setUsbMessages] = useState<string[]>([]);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 

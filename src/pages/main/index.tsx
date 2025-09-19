@@ -1,104 +1,78 @@
 import { useNavigate } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
-import CategoryCard from "./component/CategoryCard";
 import { Button, Flex, Spin, Typography } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
+
 import { wasteMap } from "../../types/wasteType";
 import VideoPr from "../../assets/video/smart_bit_pr.mp4";
 import kCleanLogo from "../../assets/images/Logo/K-CLEAN-LOGO.png";
 import pmoLogo from "../../assets/images/Logo/pmo_logo.png";
 import buildKmitlLogo from "../../assets/images/Logo/BUILD_KMITL-LOGO.png";
-import techsureLogo from "../../assets/images/Logo/techsure_logo.png";
+import kdmcLogo from "../../assets/images/Logo/kdmc_logo.png";
+import sciraLogo from "../../assets/images/Logo/scira_logo.png";
+
 import Header from "../../component/Header";
 import mianThSound from "../../assets/sound/0-มาช่วยกันแ.mp3";
 import mianEnSound from "../../assets/sound/3-Let'shelps.mp3";
+
+import CategoryCard from "./component/CategoryCard";
 import { useTank } from "../../context/TankContext";
 import { usePoints } from "../../context/PointsContext";
 
+import { useLanguageToggle } from "../../hook/useLanguageToggle";
+import { useUsbMessages } from "../../hook/useUsbMessages";
+import { useVideoOverlay } from "../../hook/useVideoOverlay";
+import { useResetPoints } from "../../hook/useResetPoints";
 
 const { Text } = Typography;
 
 const MainPage = () => {
   const navigate = useNavigate();
-  const [showVideoOverlay, setShowVideoOverlay] = useState(true);
-  const [defaultTouchedOnce, setDefaultTouchedOnce] = useState(false);
-  const [isEnglish, setIsEnglish] = useState(false);
-  const [fade, setFade] = useState(true);
 
-  
   const { readDataAll } = useTank();
-   const [usbMessages, setUsbMessages] = useState<string[]>([]);
+  const { totalPoints, listOfPoints, resetResults } = usePoints();
 
+  const { isEnglish, fade } = useLanguageToggle();
+  useUsbMessages(readDataAll);
+  const { showVideoOverlay, hideOverlay } = useVideoOverlay();
+  useResetPoints(totalPoints, listOfPoints, resetResults);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioFiles = [mianThSound, mianEnSound];
+  const [defaultTouchedOnce, setDefaultTouchedOnce] = useState(false);
+  const [videoLoading, setVideoLoading] = useState(true);
+
+  // hidden maintenance mode
   const topRightClickCount = useRef(0);
   const topRightTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  const overlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audioFiles = [mianThSound, mianEnSound];
-
-  const [videoLoading, setVideoLoading] = useState(true); 
   const videoRef = useRef<HTMLVideoElement | null>(null);
-
-  const { totalPoints, listOfPoints, resetResults } = usePoints();
+  
+  // initial video played once
+  const [initialVideoPlayed, setInitialVideoPlayed] = useState(false);
+  const initialVideoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setFade(false);
-      setTimeout(() => {
-        setIsEnglish(prev => !prev);
-        setFade(true); 
-      }, 300); 
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
-
- // ------------------- USB readDataAll and messages -------------------
-  useEffect(() => {
-    const handleUsbMessage = (message: string) => {
-      setUsbMessages(prev => [...prev, message]);
-      console.log("USB message (SuccessScore):", message);
-    };
-
-    const originalHandler = window.onUsbMessage;
-    window.onUsbMessage = handleUsbMessage; 
-    readDataAll();
-
-    const intervalId = setInterval(() => {
-      readDataAll();
-    }, 10000); 
-
-    return () => {
-      window.onUsbMessage = originalHandler;
-      clearInterval(intervalId);
-    };
-  }, [readDataAll]);
-
-
-  const startVideoTimeout = () => {
-    if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
-    overlayTimeoutRef.current = setTimeout(() => {
-      setShowVideoOverlay(true);
-    }, 10000);
-  };
-
-  const handleOverlayClick = () => {
-    setShowVideoOverlay(false);
-    setDefaultTouchedOnce(false);
-    startVideoTimeout();
-    if (audioRef.current) {
-      audioRef.current.play().catch(() => {});
+    if (!initialVideoPlayed && initialVideoRef.current) {
+      initialVideoRef.current.muted = true; // allow autoplay
+      initialVideoRef.current.play().catch(() => {});
+      setInitialVideoPlayed(true);
     }
-  };
+  }, [initialVideoPlayed]);
 
   const handleDefaultClick = () => {
     if (!defaultTouchedOnce) {
       setDefaultTouchedOnce(true);
-      startVideoTimeout();
 
+      // stop initial video
+      if (initialVideoRef.current) {
+        initialVideoRef.current.pause();
+        initialVideoRef.current.currentTime = 0;
+      }
+
+      // play audio sequence
       if (audioRef.current) {
         let index = 0;
-
         const playNext = () => {
           if (index < audioFiles.length) {
             audioRef.current!.src = audioFiles[index];
@@ -110,16 +84,20 @@ const MainPage = () => {
             audioRef.current!.onended = null;
           }
         };
-
         playNext();
       }
+
+      // play overlay video
+      if (videoRef.current) {
+        videoRef.current.muted = false;
+        videoRef.current.play().catch(() => {});
+      }
     } else {
-      if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
       navigate("/scan");
     }
   };
 
-   const handleTopRightClick = () => {
+  const handleTopRightClick = () => {
     topRightClickCount.current += 1;
 
     if (topRightClickCount.current === 3) {
@@ -130,33 +108,27 @@ const MainPage = () => {
       if (topRightTimeout.current) clearTimeout(topRightTimeout.current);
       topRightTimeout.current = setTimeout(() => {
         topRightClickCount.current = 0;
-      }, 1000); 
+      }, 1000);
     }
   };
 
- const customIcon = <LoadingOutlined style={{ fontSize: 200, color: "#F16323" }} spin />;
-  
- // ------------------- reset results -------------------
-  useEffect(() => {
-    if ((totalPoints > 0 || listOfPoints.length > 0) && resetResults) {
-      resetResults();
-      console.log("✅ Points reset on MainPage because there were points");
-    }
-  }, [totalPoints, listOfPoints, resetResults]);
+  const customIcon = <LoadingOutlined style={{ fontSize: 200, color: "#F16323" }} spin />;
 
   return (
     <Flex className="w-full h-full flex-col items-center justify-center relative">
+      {/* Header */}
       <Flex className="w-full sticky top-0 z-20 bg-white">
-            <Header />
+        <Header />
       </Flex>
 
+      {/* Main content */}
       <Flex
         className="w-full flex-1 flex flex-col items-center justify-center"
         onClick={handleDefaultClick}
         onTouchStart={handleDefaultClick}
       >
-        
         <Flex vertical className="gap-[140px] items-center justify-center">
+          {/* Headline */}
           <Flex vertical className="items-center relative ">
             <Text
               className={`text-hero font-bold transition-opacity duration-300 ${
@@ -178,13 +150,14 @@ const MainPage = () => {
             </Text>
           </Flex>
 
+          {/* Waste categories */}
           <Flex className="grid grid-cols-5 divide-x-2 divide-gray-300 mt-6">
             {Object.entries(wasteMap).map(([key, waste]) => (
               <CategoryCard
                 key={key}
                 image={waste.image}
                 header={isEnglish ? waste.description : key}
-                 fade={fade}
+                fade={fade}
                 bgColor={waste.bgColor}
                 iconColor={waste.iconColor || waste.bgColor}
                 textColor={waste.textColor}
@@ -192,6 +165,7 @@ const MainPage = () => {
             ))}
           </Flex>
 
+          {/* Tap to start button */}
           <Flex vertical className="items-center">
             <Button
               type="primary"
@@ -204,46 +178,49 @@ const MainPage = () => {
           </Flex>
         </Flex>
 
-  
-        <Flex vertical className="items-center mt-72">
+        {/* Partner logos */}
+        <Flex vertical className="items-center mt-64">
           <Text
             className={`text-heading-s ${fade ? "animate-fadeIn" : "animate-fadeOut"}`}
           >
             {isEnglish ? "Developed by" : "ร่วมพัฒนาโดย"}
           </Text>
-          <Flex className="items-center justify-center gap-10">
+          <Flex className="items-center justify-center gap-10 mt-6">
             <img src={kCleanLogo} alt="Logo" className="h-[80px] cursor-pointer" />
             <img src={pmoLogo} alt="Logo" className="h-[80px] cursor-pointer" />
             <img src={buildKmitlLogo} alt="Logo" className="h-[80px] cursor-pointer" />
-            <img src={techsureLogo} alt="Logo" className="h-[50px] cursor-pointer" />
+            <img src={kdmcLogo} alt="Logo" className="h-[70px] cursor-pointer" />
+            <img src={sciraLogo} alt="Logo" className="h-[50px] cursor-pointer" />
           </Flex>
         </Flex>
       </Flex>
 
+      {/* Video overlay */}
       {showVideoOverlay && (
         <Flex
           className="absolute w-full h-full items-center justify-center bg-black z-20"
-          onClick={handleOverlayClick}
-          onTouchStart={handleOverlayClick}
+          onClick={hideOverlay}
+          onTouchStart={hideOverlay}
         >
           {videoLoading && (
-             <Spin
-              indicator={customIcon} 
+            <Spin
+              indicator={customIcon}
               tip="Connecting to camera..."
               className="absolute z-50"
               style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}
             />
           )}
-            <video
+          <video
             ref={videoRef}
             src={VideoPr}
+            preload="auto"
             autoPlay
             loop
             playsInline
             className={`absolute w-full h-full object-cover object-center ${
               videoLoading ? "opacity-0" : "opacity-100 transition-opacity duration-500"
             }`}
-            onCanPlay={() => setVideoLoading(false)} 
+            onCanPlay={() => setVideoLoading(false)}
           />
           <Flex
             vertical
@@ -261,8 +238,10 @@ const MainPage = () => {
         </Flex>
       )}
 
+      {/* Audio player */}
       <audio ref={audioRef} preload="auto" />
 
+      {/* Hidden top-right maintenance mode trigger */}
       <div
         onClick={handleTopRightClick}
         style={{
@@ -273,7 +252,6 @@ const MainPage = () => {
           height: 50,
           zIndex: 50,
           cursor: "pointer",
-          // backgroundColor: "rgba(255,0,0,0.2)",
         }}
       />
     </Flex>
