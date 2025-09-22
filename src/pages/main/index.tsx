@@ -216,6 +216,7 @@ const MainPage = () => {
             preload="auto"
             autoPlay
             loop
+            muted
             playsInline
             className={`absolute w-full h-full object-cover object-center ${
               videoLoading ? "opacity-0" : "opacity-100 transition-opacity duration-500"

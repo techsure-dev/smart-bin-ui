@@ -49,8 +49,7 @@ export const PointsProvider = ({ children }: { children: ReactNode }) => {
 
   const listOfPoints: [string, number][] = results.map((item) => {
     const count = item.weight_g / 100;
-    const pointPerUnit = pointTable[item.point_map] || 0;
-    return [item.point_map, pointPerUnit * count] as [string, number];
+    return [item.point_map, count] as [string, number];
   });
 
    useEffect(() => {
